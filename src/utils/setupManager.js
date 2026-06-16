@@ -13,7 +13,6 @@ import {
   roleDefinitions,
   roleNames,
   rulesMessage,
-  memberEntryChannelName,
   trackedChannelNames,
   trackedRoleNames
 } from '../config/serverConfig.js';
@@ -252,7 +251,6 @@ export async function publishEntryMessages(channels, options = {}) {
 
 export async function runSetup(guild, options = {}) {
   await deleteDefaultChannels(guild);
-  await deleteEntryChannels(guild);
   const roles = await ensureRoles(guild);
   await ensureAutoAccess(guild);
   const channels = await ensureChannels(guild, roles, { createMissing: options.createMissing === true });
@@ -262,13 +260,6 @@ export async function runSetup(guild, options = {}) {
   await publishEntryMessages(channels, options.messages);
 
   return { roles, channels };
-}
-
-async function deleteEntryChannels(guild) {
-  const channels = guild.channels.cache.filter((channel) => channel.name === memberEntryChannelName);
-  for (const channel of channels.values()) {
-    await channel.delete('Suppression salon entrees').catch(() => null);
-  }
 }
 
 async function ensureAutoAccess(guild) {
