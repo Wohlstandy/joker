@@ -177,6 +177,51 @@ export const categoryDefinitions = [
     ]
   },
   {
+    key: 'management',
+    name: '\u2620\uFE0F\u30FBThe Real KKK',
+    type: ChannelType.GuildCategory,
+    access: 'koolOnly',
+    children: [
+      {
+        key: 'truth',
+        name: '\u2620\uFE0F\u30FBla-v\u00E9rit\u00E9',
+        type: ChannelType.GuildText,
+        topic: 'Salon priv\u00E9 Klown & Kool.'
+      },
+      {
+        key: 'koolKlownVoice',
+        name: '\u{1F53A}\u30FBKKK',
+        type: ChannelType.GuildVoice
+      }
+    ]
+  },
+  {
+    key: 'dofus',
+    name: '\u{1F4F0}\u30FBGazette des Klowns',
+    type: ChannelType.GuildCategory,
+    access: 'gazette',
+    children: [
+      {
+        key: 'announcements',
+        name: '\u{1F4E2}\u30FBannonces',
+        type: ChannelType.GuildText,
+        topic: 'Annonces importantes de la guilde.'
+      },
+      {
+        key: 'events',
+        name: '\u{1F4C5}\u30FBevents',
+        type: ChannelType.GuildText,
+        topic: 'Organisation des \u00E9v\u00E9nements de guilde.'
+      },
+      {
+        key: 'news',
+        name: '\u{1F5DE}\uFE0F\u30FBactualit\u00E9',
+        type: ChannelType.GuildText,
+        topic: 'Actualit\u00E9s li\u00E9es \u00E0 Dofus.'
+      }
+    ]
+  },
+  {
     key: 'main',
     name: '\u{1F3AA}\u30FBLe Chapiteau',
     type: ChannelType.GuildCategory,
@@ -211,51 +256,6 @@ export const categoryDefinitions = [
         name: '\u{1F58C}\uFE0F\u30FBskins',
         type: ChannelType.GuildText,
         topic: 'Partage de skins et looks de personnages.'
-      }
-    ]
-  },
-  {
-    key: 'dofus',
-    name: '\u{1F4F0}\u30FBGazette des Klowns',
-    type: ChannelType.GuildCategory,
-    access: 'gazette',
-    children: [
-      {
-        key: 'announcements',
-        name: '\u{1F4E2}\u30FBannonces',
-        type: ChannelType.GuildText,
-        topic: 'Annonces importantes de la guilde.'
-      },
-      {
-        key: 'events',
-        name: '\u{1F4C5}\u30FBevents',
-        type: ChannelType.GuildText,
-        topic: 'Organisation des \u00E9v\u00E9nements de guilde.'
-      },
-      {
-        key: 'news',
-        name: '\u{1F5DE}\uFE0F\u30FBactualit\u00E9',
-        type: ChannelType.GuildText,
-        topic: 'Actualit\u00E9s li\u00E9es \u00E0 Dofus.'
-      }
-    ]
-  },
-  {
-    key: 'management',
-    name: '\u2620\uFE0F\u30FBThe Real KKK',
-    type: ChannelType.GuildCategory,
-    access: 'koolOnly',
-    children: [
-      {
-        key: 'truth',
-        name: '\u2620\uFE0F\u30FBla-v\u00E9rit\u00E9',
-        type: ChannelType.GuildText,
-        topic: 'Salon priv\u00E9 Klown & Kool.'
-      },
-      {
-        key: 'koolKlownVoice',
-        name: '\u{1F53A}\u30FBKKK',
-        type: ChannelType.GuildVoice
       }
     ]
   },

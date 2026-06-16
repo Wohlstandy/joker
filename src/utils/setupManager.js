@@ -257,7 +257,6 @@ export async function runSetup(guild, options = {}) {
   const channels = await ensureChannels(guild, roles, { createMissing: options.createMissing === true });
   await cleanEntryChannel(channels);
   await ensureThroneAccess(guild, channels, roles);
-  await ensureCategoryOrder(channels);
   await publishEntryMessages(channels, options.messages);
 
   return { roles, channels };
@@ -282,15 +281,6 @@ async function cleanEntryChannel(channels) {
   const botMessages = messages?.filter((message) => message.author.id === channel.client.user.id);
   if (botMessages?.size) {
     await channel.bulkDelete(botMessages, true).catch(() => null);
-  }
-}
-
-async function ensureCategoryOrder(channels) {
-  if (channels.throne && channels.management) {
-    await channels.management.setPosition(channels.throne.position + 1).catch(() => null);
-  }
-  if (channels.dofus && channels.main) {
-    await channels.dofus.setPosition(channels.main.position).catch(() => null);
   }
 }
 
