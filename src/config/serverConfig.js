@@ -130,35 +130,6 @@ export const tempVoiceConfig = {
 
 export const categoryDefinitions = [
   {
-    key: 'sas',
-    name: '\u{1F6AA}\u30FBVestibule',
-    type: ChannelType.GuildCategory,
-    access: 'visitor',
-    children: [
-      {
-        key: 'rules',
-        name: '\u{1F4DC}\u30FBr\u00E8glement',
-        type: ChannelType.GuildText,
-        topic: "Ticket d'entr\u00E9e et code de la troupe Kool Klown Klanx.",
-        preserveExisting: true
-      },
-      {
-        key: 'entries',
-        name: memberEntryChannelName,
-        type: ChannelType.GuildText,
-        access: 'entryLog',
-        topic: 'Nouveaux arrivants du serveur.'
-      },
-      {
-        key: 'departures',
-        name: memberExitChannelName,
-        type: ChannelType.GuildText,
-        access: 'entryLog',
-        topic: 'Membres qui quittent le serveur.'
-      }
-    ]
-  },
-  {
     key: 'throne',
     name: '\u{1F451}\u30FBLe Tr\u00F4ne',
     type: ChannelType.GuildCategory,
@@ -333,5 +304,5 @@ export const legacyRoleNames = [
 ];
 export const trackedChannelNames = categoryDefinitions.flatMap((category) => [
   category.name,
-  ...category.children.filter((channel) => !channel.preserveExisting).map((channel) => channel.name)
+  ...category.children.map((channel) => channel.name)
 ]);

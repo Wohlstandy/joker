@@ -1,9 +1,4 @@
-import {
-  ActionRowBuilder,
-  ButtonBuilder,
-  ButtonStyle,
-  ChannelType
-} from 'discord.js';
+import { ChannelType } from 'discord.js';
 import {
   categoryDefinitions,
   klownAutoAccessSearchTerms,
@@ -13,7 +8,6 @@ import {
   memberRoleExcludedSearchTerms,
   roleDefinitions,
   roleNames,
-  rulesMessage,
   trackedChannelNames,
   trackedRoleNames
 } from '../config/serverConfig.js';
@@ -21,6 +15,12 @@ import { buildPermissionOverwrites } from './permissions.js';
 
 export const ACCEPT_RULES_CUSTOM_ID = 'accept_rules_ticket';
 const defaultChannelNames = ['general', 'Général', 'général', 'Text Channels', 'Voice Channels'];
+const legacyVestibuleNames = [
+  '\u{1F6AA}\u30FBVestibule',
+  '\u{1F4DC}\u30FBr\u00E8glement',
+  '\u{1F44B}\u30FBentr\u00E9es',
+  '\u{1F449}\u30FBsorties'
+];
 
 export async function ensureRoles(guild) {
   const roles = new Map(guild.roles.cache.map((role) => [role.name, role]));
@@ -230,36 +230,30 @@ async function hasBotMessage(channel) {
   return messages.some((message) => message.author.id === channel.client.user.id);
 }
 
-export async function publishEntryMessages(channels, options = {}) {
-  const { force = false } = options;
-  const button = new ButtonBuilder()
-    .setCustomId(ACCEPT_RULES_CUSTOM_ID)
-    .setLabel('\u2705 Accepter le r\u00E8glement')
-    .setStyle(ButtonStyle.Success);
-
-  const row = new ActionRowBuilder().addComponents(button);
-
-  if (channels.rules && (force || !(await hasBotMessage(channels.rules)))) {
-    if (force) {
-      await channels.rules.bulkDelete(10).catch(() => null);
-    }
-    await channels.rules.send({
-      content: rulesMessage,
-      components: [row]
-    });
-  }
-}
-
 export async function runSetup(guild, options = {}) {
   await deleteDefaultChannels(guild);
+  await deleteLegacyVestibule(guild);
   const roles = await ensureRoles(guild);
   await ensureAutoAccess(guild);
   const channels = await ensureChannels(guild, roles, { createMissing: options.createMissing === true });
-  await cleanEntryChannel(channels);
   await ensureThroneAccess(guild, channels, roles);
-  await publishEntryMessages(channels, options.messages);
 
   return { roles, channels };
+}
+
+async function deleteLegacyVestibule(guild) {
+  const channels = guild.channels.cache.filter((channel) => legacyVestibuleNames.includes(channel.name));
+  for (const channel of channels.sort((a, b) => {
+    if (a.type === ChannelType.GuildCategory && b.type !== ChannelType.GuildCategory) {
+      return 1;
+    }
+    if (a.type !== ChannelType.GuildCategory && b.type === ChannelType.GuildCategory) {
+      return -1;
+    }
+    return 0;
+  }).values()) {
+    await channel.delete('Suppression ancien Vestibule').catch(() => null);
+  }
 }
 
 async function ensureAutoAccess(guild) {
@@ -269,18 +263,6 @@ async function ensureAutoAccess(guild) {
   }
   for (const member of guild.members.cache.filter(getsAutoKweenAccess).values()) {
     await grantKweenAccess(member);
-  }
-}
-
-async function cleanEntryChannel(channels) {
-  const channel = channels.entries;
-  if (!channel?.isTextBased()) {
-    return;
-  }
-  const messages = await channel.messages.fetch({ limit: 100 }).catch(() => null);
-  const botMessages = messages?.filter((message) => message.author.id === channel.client.user.id);
-  if (botMessages?.size) {
-    await channel.bulkDelete(botMessages, true).catch(() => null);
   }
 }
 
