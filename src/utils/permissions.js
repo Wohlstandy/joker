@@ -61,7 +61,7 @@ export function buildPermissionOverwrites(guild, roles, access) {
   const troupeRoles = [member, saltimbanque, queen, kool];
   const moderatorRoles = [saltimbanque, queen, kool];
   const seniorRoles = [queen, kool];
-  const entryWriteRoles = [klown, queen, kool];
+  const entryWriteRoles = [klown, queen, kool, saltimbanque];
 
   const overwrites = {
     visitor: [
