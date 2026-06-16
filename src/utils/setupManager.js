@@ -15,12 +15,6 @@ import { buildPermissionOverwrites } from './permissions.js';
 
 export const ACCEPT_RULES_CUSTOM_ID = 'accept_rules_ticket';
 const defaultChannelNames = ['general', 'Général', 'général', 'Text Channels', 'Voice Channels'];
-const legacyVestibuleNames = [
-  '\u{1F6AA}\u30FBVestibule',
-  '\u{1F4DC}\u30FBr\u00E8glement',
-  '\u{1F44B}\u30FBentr\u00E9es',
-  '\u{1F449}\u30FBsorties'
-];
 
 export async function ensureRoles(guild) {
   const roles = new Map(guild.roles.cache.map((role) => [role.name, role]));
@@ -112,7 +106,7 @@ export async function ensureChannels(guild, roles, options = {}) {
         permissionOverwrites,
         reason: 'Creation setup Kool Klown Klanx'
       });
-    } else {
+    } else if (!categoryDefinition.preserveExisting) {
       await category.permissionOverwrites.set(permissionOverwrites);
     }
 
@@ -232,28 +226,12 @@ async function hasBotMessage(channel) {
 
 export async function runSetup(guild, options = {}) {
   await deleteDefaultChannels(guild);
-  await deleteLegacyVestibule(guild);
   const roles = await ensureRoles(guild);
   await ensureAutoAccess(guild);
   const channels = await ensureChannels(guild, roles, { createMissing: options.createMissing === true });
   await ensureThroneAccess(guild, channels, roles);
 
   return { roles, channels };
-}
-
-async function deleteLegacyVestibule(guild) {
-  const channels = guild.channels.cache.filter((channel) => legacyVestibuleNames.includes(channel.name));
-  for (const channel of channels.sort((a, b) => {
-    if (a.type === ChannelType.GuildCategory && b.type !== ChannelType.GuildCategory) {
-      return 1;
-    }
-    if (a.type !== ChannelType.GuildCategory && b.type === ChannelType.GuildCategory) {
-      return -1;
-    }
-    return 0;
-  }).values()) {
-    await channel.delete('Suppression ancien Vestibule').catch(() => null);
-  }
 }
 
 async function ensureAutoAccess(guild) {
