@@ -1,0 +1,12 @@
+name: Render Ping
+
+on:
+  schedule:
+    - cron: "*/10 * * * *"
+  workflow_dispatch:
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - run: curl -fsS https://kool-klown-klanx-discord-bot.onrender.com
