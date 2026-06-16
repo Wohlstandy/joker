@@ -229,10 +229,40 @@ export async function runSetup(guild, options = {}) {
   const roles = await ensureRoles(guild);
   await ensureAutoAccess(guild);
   const channels = await ensureChannels(guild, roles, { createMissing: options.createMissing === true });
+  await ensureRulesAccess(guild, roles);
   await ensureEntryLogAccess(guild, roles);
   await ensureThroneAccess(guild, channels, roles);
 
   return { roles, channels };
+}
+
+async function ensureRulesAccess(guild, roles) {
+  const channel = guild.channels.cache.find((candidate) => candidate.name === '\u{1F4DC}\u30FBr\u00E8glement');
+  if (!channel?.isTextBased()) {
+    return;
+  }
+
+  await channel.permissionOverwrites.edit(guild.roles.everyone.id, {
+    ViewChannel: true,
+    ReadMessageHistory: true,
+    SendMessages: false
+  }).catch(() => null);
+
+  for (const roleName of [roleNames.visiteur, roleNames.saltimbanque, roleNames.kool, roleNames.queen, roleNames.klown]) {
+    const role = guild.roles.cache.find((candidate) => candidate.name === roleName);
+    if (role) {
+      await channel.permissionOverwrites.edit(role.id, {
+        ViewChannel: true,
+        ReadMessageHistory: true,
+        SendMessages: false
+      }).catch(() => null);
+    }
+  }
+
+  const memberRole = roles.get(roleNames.membre);
+  if (memberRole) {
+    await channel.permissionOverwrites.edit(memberRole.id, { ViewChannel: false }).catch(() => null);
+  }
 }
 
 async function ensureEntryLogAccess(guild, roles) {
