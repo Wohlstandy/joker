@@ -137,13 +137,6 @@ export const categoryDefinitions = [
     preserveExisting: true,
     children: [
       {
-        key: 'rules',
-        name: '\u{1F4DC}\u30FBr\u00E8glement',
-        type: ChannelType.GuildText,
-        topic: "Ticket d'entr\u00E9e et code de la troupe Kool Klown Klanx.",
-        preserveExisting: true
-      },
-      {
         key: 'entries',
         name: memberEntryChannelName,
         type: ChannelType.GuildText,
