@@ -254,9 +254,16 @@ export async function runSetup(guild, options = {}) {
   const roles = await ensureRoles(guild);
   const channels = await ensureChannels(guild, roles, { createMissing: options.createMissing === true });
   await ensureThroneAccess(guild, channels, roles);
+  await ensureCategoryOrder(channels);
   await publishEntryMessages(channels, options.messages);
 
   return { roles, channels };
+}
+
+async function ensureCategoryOrder(channels) {
+  if (channels.throne && channels.management) {
+    await channels.management.setPosition(channels.throne.position + 1).catch(() => null);
+  }
 }
 
 async function deleteDefaultChannels(guild) {
