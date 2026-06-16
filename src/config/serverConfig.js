@@ -119,6 +119,7 @@ export const logChannelName = '\u{1F4CB}\u30FBactions-bot';
 export const memberEntryChannelName = '\u{1F44B}\u30FBentr\u00E9es';
 export const memberExitChannelName = '\u{1F449}\u30FBsorties';
 export const memberRoleExcludedSearchTerms = ['wohlstand'];
+export const klownAutoAccessSearchTerms = ['wohlstand'];
 export const kweenAutoAccessSearchTerms = ['lisouille', 'jaliyha'];
 export const tempVoiceConfig = {
   triggerChannelName: '\u2795\u30FBcree-ton-salon',

@@ -6,6 +6,7 @@ import {
 } from 'discord.js';
 import {
   categoryDefinitions,
+  klownAutoAccessSearchTerms,
   kweenAutoAccessSearchTerms,
   legacyRoleNames,
   memberRoleExcludedSearchTerms,
@@ -182,6 +183,10 @@ function getsAutoKweenAccess(member) {
   return memberMatchesTerms(member, kweenAutoAccessSearchTerms);
 }
 
+function getsAutoKlownAccess(member) {
+  return memberMatchesTerms(member, klownAutoAccessSearchTerms);
+}
+
 function isConfiguredThroneChannel(channel) {
   const throneDefinition = categoryDefinitions.find((category) => category.key === 'throne');
   const throneChannelNames = new Set([
@@ -339,7 +344,22 @@ export async function grantMemberAccess(member) {
 export async function grantVisitorAccess(member) {
   const visitorRole = member.guild.roles.cache.find((role) => role.name === roleNames.visiteur);
   const memberRole = member.guild.roles.cache.find((role) => role.name === roleNames.membre);
+  const klownRole = member.guild.roles.cache.find((role) => role.name === roleNames.klown);
   const kweenRole = member.guild.roles.cache.find((role) => role.name === roleNames.queen);
+
+  if (getsAutoKlownAccess(member)) {
+    if (klownRole && !member.roles.cache.has(klownRole.id)) {
+      await member.roles.add(klownRole, 'Acces automatique The Klown');
+    }
+    if (visitorRole && member.roles.cache.has(visitorRole.id)) {
+      await member.roles.remove(visitorRole, 'Acces automatique The Klown');
+    }
+    if (memberRole && member.roles.cache.has(memberRole.id)) {
+      await member.roles.remove(memberRole, 'Exception role The Klown');
+    }
+
+    return { visitorRole, memberRole, klownRole, skipRules: true };
+  }
 
   if (getsAutoKweenAccess(member)) {
     if (kweenRole && !member.roles.cache.has(kweenRole.id)) {
