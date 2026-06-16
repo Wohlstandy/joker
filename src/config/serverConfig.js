@@ -141,13 +141,6 @@ export const categoryDefinitions = [
         topic: "Ticket d'entr\u00E9e et code de la troupe Kool Klown Klanx."
       },
       {
-        key: 'entries',
-        name: memberEntryChannelName,
-        type: ChannelType.GuildText,
-        access: 'entryLog',
-        topic: 'Nouveaux arrivants du serveur.'
-      },
-      {
         key: 'departures',
         name: memberExitChannelName,
         type: ChannelType.GuildText,
