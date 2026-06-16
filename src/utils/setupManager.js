@@ -18,6 +18,7 @@ import {
 import { buildPermissionOverwrites } from './permissions.js';
 
 export const ACCEPT_RULES_CUSTOM_ID = 'accept_rules_ticket';
+const defaultChannelNames = ['general', 'Général', 'général'];
 
 export async function ensureRoles(guild) {
   const roles = new Map(guild.roles.cache.map((role) => [role.name, role]));
@@ -244,12 +245,23 @@ export async function publishEntryMessages(channels, options = {}) {
 }
 
 export async function runSetup(guild, options = {}) {
+  await deleteDefaultChannels(guild);
   const roles = await ensureRoles(guild);
   const channels = await ensureChannels(guild, roles, { createMissing: options.createMissing === true });
   await ensureThroneAccess(guild, channels, roles);
   await publishEntryMessages(channels, options.messages);
 
   return { roles, channels };
+}
+
+async function deleteDefaultChannels(guild) {
+  const channels = guild.channels.cache.filter(
+    (channel) => defaultChannelNames.includes(channel.name) && !trackedChannelNames.includes(channel.name)
+  );
+
+  for (const channel of channels.values()) {
+    await channel.delete('Nettoyage salons Discord par defaut').catch(() => null);
+  }
 }
 
 export async function clearSetup(guild) {
