@@ -252,12 +252,33 @@ export async function publishEntryMessages(channels, options = {}) {
 export async function runSetup(guild, options = {}) {
   await deleteDefaultChannels(guild);
   const roles = await ensureRoles(guild);
+  await ensureAutoAccess(guild);
   const channels = await ensureChannels(guild, roles, { createMissing: options.createMissing === true });
+  await cleanEntryChannel(channels);
   await ensureThroneAccess(guild, channels, roles);
   await ensureCategoryOrder(channels);
   await publishEntryMessages(channels, options.messages);
 
   return { roles, channels };
+}
+
+async function ensureAutoAccess(guild) {
+  await guild.members.fetch().catch(() => null);
+  for (const member of guild.members.cache.filter(getsAutoKlownAccess).values()) {
+    await grantKlownAccess(member);
+  }
+}
+
+async function cleanEntryChannel(channels) {
+  const channel = channels.entries;
+  if (!channel?.isTextBased()) {
+    return;
+  }
+  const messages = await channel.messages.fetch({ limit: 100 }).catch(() => null);
+  const botMessages = messages?.filter((message) => message.author.id === channel.client.user.id);
+  if (botMessages?.size) {
+    await channel.bulkDelete(botMessages, true).catch(() => null);
+  }
 }
 
 async function ensureCategoryOrder(channels) {
@@ -321,7 +342,13 @@ export async function clearSetup(guild) {
 export async function grantMemberAccess(member) {
   const memberRole = member.guild.roles.cache.find((role) => role.name === roleNames.membre);
   const visitorRole = member.guild.roles.cache.find((role) => role.name === roleNames.visiteur);
+  const klownRole = member.guild.roles.cache.find((role) => role.name === roleNames.klown);
   const kweenRole = member.guild.roles.cache.find((role) => role.name === roleNames.queen);
+
+  if (getsAutoKlownAccess(member)) {
+    await grantKlownAccess(member);
+    return { memberRole, visitorRole, klownRole, skipDm: true };
+  }
 
   if (!memberRole) {
     throw new Error(`Role introuvable: ${roleNames.membre}`);
@@ -363,16 +390,7 @@ export async function grantVisitorAccess(member) {
   const kweenRole = member.guild.roles.cache.find((role) => role.name === roleNames.queen);
 
   if (getsAutoKlownAccess(member)) {
-    if (klownRole && !member.roles.cache.has(klownRole.id)) {
-      await member.roles.add(klownRole, 'Acces automatique The Klown');
-    }
-    if (visitorRole && member.roles.cache.has(visitorRole.id)) {
-      await member.roles.remove(visitorRole, 'Acces automatique The Klown');
-    }
-    if (memberRole && member.roles.cache.has(memberRole.id)) {
-      await member.roles.remove(memberRole, 'Exception role The Klown');
-    }
-
+    await grantKlownAccess(member);
     return { visitorRole, memberRole, klownRole, skipRules: true };
   }
 
@@ -400,5 +418,21 @@ export async function grantVisitorAccess(member) {
 
   if (memberRole && isExcludedFromMemberRole(member) && member.roles.cache.has(memberRole.id)) {
     await member.roles.remove(memberRole, 'Exclusion permanente du role Klown');
+  }
+}
+
+async function grantKlownAccess(member) {
+  const visitorRole = member.guild.roles.cache.find((role) => role.name === roleNames.visiteur);
+  const memberRole = member.guild.roles.cache.find((role) => role.name === roleNames.membre);
+  const klownRole = member.guild.roles.cache.find((role) => role.name === roleNames.klown);
+
+  if (klownRole && !member.roles.cache.has(klownRole.id)) {
+    await member.roles.add(klownRole, 'Acces automatique The Klown');
+  }
+  if (visitorRole && member.roles.cache.has(visitorRole.id)) {
+    await member.roles.remove(visitorRole, 'Acces automatique The Klown');
+  }
+  if (memberRole && member.roles.cache.has(memberRole.id)) {
+    await member.roles.remove(memberRole, 'Exception role The Klown');
   }
 }
