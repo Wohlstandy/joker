@@ -136,6 +136,13 @@ export const categoryDefinitions = [
     access: 'visitor',
     children: [
       {
+        key: 'rules',
+        name: '\u{1F4DC}\u30FBr\u00E8glement',
+        type: ChannelType.GuildText,
+        topic: "Ticket d'entr\u00E9e et code de la troupe Kool Klown Klanx.",
+        preserveExisting: true
+      },
+      {
         key: 'entries',
         name: memberEntryChannelName,
         type: ChannelType.GuildText,
@@ -326,5 +333,5 @@ export const legacyRoleNames = [
 ];
 export const trackedChannelNames = categoryDefinitions.flatMap((category) => [
   category.name,
-  ...category.children.map((channel) => channel.name)
+  ...category.children.filter((channel) => !channel.preserveExisting).map((channel) => channel.name)
 ]);

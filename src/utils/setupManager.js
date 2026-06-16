@@ -146,7 +146,7 @@ export async function ensureChannels(guild, roles, options = {}) {
           permissionOverwrites: childPermissionOverwrites,
           reason: 'Creation setup Kool Klown Klanx'
         });
-      } else {
+      } else if (!channelDefinition.preserveExisting) {
         await channel.setParent(category.id, { lockPermissions: false });
         await channel.permissionOverwrites.set(childPermissionOverwrites);
         if (channelDefinition.type === ChannelType.GuildText) {
