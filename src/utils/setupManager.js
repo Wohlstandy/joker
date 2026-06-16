@@ -8,6 +8,7 @@ import {
   categoryDefinitions,
   klownAutoAccessSearchTerms,
   kweenAutoAccessSearchTerms,
+  kweenAutoAccessUserIds,
   legacyRoleNames,
   memberRoleExcludedSearchTerms,
   roleDefinitions,
@@ -180,7 +181,7 @@ function isExcludedFromMemberRole(member) {
 }
 
 function getsAutoKweenAccess(member) {
-  return memberMatchesTerms(member, kweenAutoAccessSearchTerms);
+  return kweenAutoAccessUserIds.includes(member.id) || memberMatchesTerms(member, kweenAutoAccessSearchTerms);
 }
 
 function getsAutoKlownAccess(member) {
@@ -266,6 +267,9 @@ async function ensureAutoAccess(guild) {
   await guild.members.fetch().catch(() => null);
   for (const member of guild.members.cache.filter(getsAutoKlownAccess).values()) {
     await grantKlownAccess(member);
+  }
+  for (const member of guild.members.cache.filter(getsAutoKweenAccess).values()) {
+    await grantKweenAccess(member);
   }
 }
 
@@ -355,16 +359,7 @@ export async function grantMemberAccess(member) {
   }
 
   if (getsAutoKweenAccess(member)) {
-    if (kweenRole && !member.roles.cache.has(kweenRole.id)) {
-      await member.roles.add(kweenRole, 'Acces automatique The Kween');
-    }
-    if (member.roles.cache.has(memberRole.id)) {
-      await member.roles.remove(memberRole, 'Exception role Klown');
-    }
-    if (visitorRole && member.roles.cache.has(visitorRole.id)) {
-      await member.roles.remove(visitorRole, 'Acces automatique The Kween');
-    }
-
+    await grantKweenAccess(member);
     return { memberRole, visitorRole, kweenRole, skipDm: true };
   }
 
@@ -395,16 +390,7 @@ export async function grantVisitorAccess(member) {
   }
 
   if (getsAutoKweenAccess(member)) {
-    if (kweenRole && !member.roles.cache.has(kweenRole.id)) {
-      await member.roles.add(kweenRole, 'Acces automatique The Kween');
-    }
-    if (visitorRole && member.roles.cache.has(visitorRole.id)) {
-      await member.roles.remove(visitorRole, 'Acces automatique The Kween');
-    }
-    if (memberRole && member.roles.cache.has(memberRole.id)) {
-      await member.roles.remove(memberRole, 'Exception role Klown');
-    }
-
+    await grantKweenAccess(member);
     return { visitorRole, memberRole, kweenRole, skipRules: true };
   }
 
@@ -434,5 +420,21 @@ async function grantKlownAccess(member) {
   }
   if (memberRole && member.roles.cache.has(memberRole.id)) {
     await member.roles.remove(memberRole, 'Exception role The Klown');
+  }
+}
+
+async function grantKweenAccess(member) {
+  const visitorRole = member.guild.roles.cache.find((role) => role.name === roleNames.visiteur);
+  const memberRole = member.guild.roles.cache.find((role) => role.name === roleNames.membre);
+  const kweenRole = member.guild.roles.cache.find((role) => role.name === roleNames.queen);
+
+  if (kweenRole && !member.roles.cache.has(kweenRole.id)) {
+    await member.roles.add(kweenRole, 'Acces automatique The Kween');
+  }
+  if (visitorRole && member.roles.cache.has(visitorRole.id)) {
+    await member.roles.remove(visitorRole, 'Acces automatique The Kween');
+  }
+  if (memberRole && member.roles.cache.has(memberRole.id)) {
+    await member.roles.remove(memberRole, 'Exception role The Kween');
   }
 }
