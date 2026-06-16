@@ -308,6 +308,7 @@ export async function clearSetup(guild) {
     roles: 0
   };
 
+  const trackedOrder = new Map(trackedChannelNames.map((name, index) => [name, index]));
   const channelsToDelete = guild.channels.cache.filter((channel) => trackedChannelNames.includes(channel.name));
 
   for (const channel of channelsToDelete.sort((a, b) => {
@@ -317,7 +318,7 @@ export async function clearSetup(guild) {
     if (a.type !== ChannelType.GuildCategory && b.type === ChannelType.GuildCategory) {
       return -1;
     }
-    return b.position - a.position;
+    return (trackedOrder.get(b.name) ?? 0) - (trackedOrder.get(a.name) ?? 0);
   }).values()) {
     await channel.delete('Suppression clearsetup Kool Klown Klanx').catch(() => null);
     deleted.channels += 1;
