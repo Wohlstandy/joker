@@ -1,4 +1,5 @@
-import { ChannelType, PermissionFlagsBits, SlashCommandBuilder } from 'discord.js';
+import { ChannelType, SlashCommandBuilder } from 'discord.js';
+import { isKlownOrKool } from '../utils/roleGuard.js';
 
 export default {
   data: new SlashCommandBuilder()
@@ -17,11 +18,15 @@ export default {
         .setDescription('Message a envoyer')
         .setRequired(true)
     )
-    .setDefaultMemberPermissions(PermissionFlagsBits.ManageMessages)
     .setDMPermission(false),
 
   async execute(interaction) {
     await interaction.deferReply({ ephemeral: true });
+
+    if (!isKlownOrKool(interaction.member)) {
+      await interaction.editReply('Commande reservee a The Klown et The Kool.');
+      return;
+    }
 
     const channel = interaction.options.getChannel('salon', true);
     const text = interaction.options.getString('texte', true);
