@@ -1,0 +1,26 @@
+{
+  "name": "kool-klown-klanx-discord-bot",
+  "version": "1.0.0",
+  "description": "Bot Discord.js v14 pour configurer automatiquement le serveur de guilde Dofus Kool Klown Klanx.",
+  "type": "module",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "node --watch src/index.js",
+    "test:welcome": "node scripts/test-welcome.js"
+  },
+  "keywords": [
+    "discord",
+    "discordjs",
+    "dofus",
+    "guild"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "discord.js": "^14.15.3",
+    "dotenv": "^16.4.5"
+  },
+  "engines": {
+    "node": ">=18.17.0"
+  }
+}
