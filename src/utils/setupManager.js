@@ -229,9 +229,21 @@ export async function runSetup(guild, options = {}) {
   const roles = await ensureRoles(guild);
   await ensureAutoAccess(guild);
   const channels = await ensureChannels(guild, roles, { createMissing: options.createMissing === true });
+  await ensureEntryLogAccess(guild, roles);
   await ensureThroneAccess(guild, channels, roles);
 
   return { roles, channels };
+}
+
+async function ensureEntryLogAccess(guild, roles) {
+  const names = ['\u{1F44B}\u30FBentr\u00E9es', '\u{1F449}\u30FBsorties'];
+  const kool = roles.get(roleNames.kool)?.id;
+  const saltimbanque = roles.get(roleNames.saltimbanque)?.id;
+  for (const channel of guild.channels.cache.filter((candidate) => names.includes(candidate.name)).values()) {
+    for (const roleId of [kool, saltimbanque].filter(Boolean)) {
+      await channel.permissionOverwrites.edit(roleId, { ViewChannel: true, ReadMessageHistory: true }).catch(() => null);
+    }
+  }
 }
 
 async function ensureAutoAccess(guild) {
