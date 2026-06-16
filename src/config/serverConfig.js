@@ -136,12 +136,6 @@ export const categoryDefinitions = [
     access: 'visitor',
     children: [
       {
-        key: 'rules',
-        name: '\u{1F4DC}\u30FBr\u00E8glement',
-        type: ChannelType.GuildText,
-        topic: "Ticket d'entr\u00E9e et code de la troupe Kool Klown Klanx."
-      },
-      {
         key: 'entries',
         name: memberEntryChannelName,
         type: ChannelType.GuildText,
