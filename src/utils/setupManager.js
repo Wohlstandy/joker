@@ -289,6 +289,9 @@ async function ensureCategoryOrder(channels) {
   if (channels.throne && channels.management) {
     await channels.management.setPosition(channels.throne.position + 1).catch(() => null);
   }
+  if (channels.dofus && channels.main) {
+    await channels.dofus.setPosition(channels.main.position).catch(() => null);
+  }
 }
 
 async function deleteDefaultChannels(guild) {
