@@ -1,5 +1,5 @@
 services:
-  - type: worker
+  - type: web
     name: kool-klown-klanx-discord-bot
     runtime: node
     plan: free

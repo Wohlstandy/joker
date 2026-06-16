@@ -1,4 +1,5 @@
 import 'dotenv/config';
+import http from 'node:http';
 import { readdir } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
@@ -15,6 +16,13 @@ const __dirname = path.dirname(__filename);
 
 if (!process.env.DISCORD_TOKEN) {
   throw new Error('DISCORD_TOKEN est manquant. Copie .env.example vers .env puis ajoute le token du bot.');
+}
+
+if (process.env.PORT) {
+  http.createServer((_, res) => {
+    res.writeHead(200, { 'Content-Type': 'text/plain' });
+    res.end('ok');
+  }).listen(Number(process.env.PORT), '0.0.0.0');
 }
 
 const client = new Client({
