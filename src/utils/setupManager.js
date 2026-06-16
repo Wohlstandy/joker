@@ -241,7 +241,11 @@ async function ensureEntryLogAccess(guild, roles) {
   const saltimbanque = roles.get(roleNames.saltimbanque)?.id;
   for (const channel of guild.channels.cache.filter((candidate) => names.includes(candidate.name)).values()) {
     for (const roleId of [kool, saltimbanque].filter(Boolean)) {
-      await channel.permissionOverwrites.edit(roleId, { ViewChannel: true, ReadMessageHistory: true }).catch(() => null);
+      await channel.permissionOverwrites.edit(roleId, {
+        ViewChannel: true,
+        ReadMessageHistory: true,
+        SendMessages: false
+      }).catch(() => null);
     }
   }
 }
