@@ -168,7 +168,7 @@ export const categoryDefinitions = [
       },
       {
         key: 'throneVoice',
-        name: '\u{1F451}\u30FBLe Tr\u00F4ne',
+        name: '\u{1F50A}\u30FBLe Tr\u00F4ne',
         type: ChannelType.GuildVoice
       }
     ]

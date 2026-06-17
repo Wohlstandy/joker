@@ -33,11 +33,6 @@ Bot Discord.js v14 pour maintenir le serveur Discord de la guilde **Kool Klown K
 - 👋・entrées
 - 👉・sorties
 
-### 👑・Le Trône
-
-- 👑・le-trône
-- 👑・Le Trône
-
 ### 📰・Gazette des Klowns
 
 - 📢・annonces
