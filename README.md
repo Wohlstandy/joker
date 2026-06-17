@@ -29,6 +29,7 @@ Bot Discord.js v14 pour maintenir le serveur Discord de la guilde **Kool Klown K
 
 ### 🚪・Vestibule
 
+- 📜・règlement
 - 👋・entrées
 - 👉・sorties
 
