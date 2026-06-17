@@ -248,7 +248,7 @@ async function ensureRulesAccess(guild, roles) {
     SendMessages: false
   }).catch(() => null);
 
-  for (const roleName of [roleNames.visiteur, roleNames.saltimbanque, roleNames.kool, roleNames.queen, roleNames.klown]) {
+  for (const roleName of [roleNames.visiteur, roleNames.saltimbanque, roleNames.kool, roleNames.klown]) {
     const role = guild.roles.cache.find((candidate) => candidate.name === roleName);
     if (role) {
       await channel.permissionOverwrites.edit(role.id, {
@@ -259,9 +259,11 @@ async function ensureRulesAccess(guild, roles) {
     }
   }
 
-  const memberRole = roles.get(roleNames.membre);
-  if (memberRole) {
-    await channel.permissionOverwrites.edit(memberRole.id, { ViewChannel: false }).catch(() => null);
+  for (const roleName of [roleNames.membre, roleNames.queen]) {
+    const role = roles.get(roleName);
+    if (role) {
+      await channel.permissionOverwrites.edit(role.id, { ViewChannel: false }).catch(() => null);
+    }
   }
 }
 
