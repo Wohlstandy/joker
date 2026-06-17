@@ -1,40 +1,36 @@
 # Kool Klown Klanx Discord Bot
 
-Bot Discord.js v14 pour configurer le serveur Discord de la guilde **Kool Klown Klanx**.
+Bot Discord.js v14 pour maintenir le serveur Discord de la guilde **Kool Klown Klanx**.
 
 ## Fonctionnalites
 
-- `/setup` cree ou resynchronise les roles, categories, salons, permissions et le bouton de reglement.
-- `/setup` ne poste aucun message visible apres execution.
-- `/clearsetup` supprime les elements suivis par le bot.
-- `/invite user:<pseudo>` cree une invitation permanente et l'envoie en message prive.
-- `/membre @user` donne manuellement le role `🤡 Klown`.
-- `/kick @user raison` expulse un membre et enregistre l'action.
-- Le bouton `✅ Accepter le reglement` retire `🚪 Visiteur` et ajoute `🤡 Klown`.
-- Les nouveaux arrivants recoivent automatiquement `🚪 Visiteur`.
-- `Lisouille` / `jaliyha` recoit directement `👑 The Kween`, sans role `🤡 Klown`, sans DM et sans validation du reglement.
-- Les logs enregistrent les arrivees, departs, validations et changements de roles.
-- Le vocal `➕・cree-ton-salon` cree automatiquement un salon vocal temporaire.
+- Synchronisation des roles, categories, salons et permissions du serveur.
+- Attribution automatique des roles d'accueil et des acces speciaux.
+- Gestion des arrivees, sorties, validations, sanctions et changements de roles dans les logs.
+- Salons vocaux temporaires crees automatiquement depuis un salon declencheur.
+- Messages administratifs envoyes par le bot dans un salon cible.
+- Suppression de messages par identifiant.
+- Health check HTTP pour l'hebergement Render.
+- Keepalive GitHub Actions pour limiter la mise en veille du service gratuit.
 
-## Roles
+## Roles geres
 
-- `👺 The Klown` : administrateur complet, affiche separement.
-- `👑 The Kween` : moderation avancee sans administrateur.
-- `🎭 The Kool` : moderation avancee sans administrateur.
-- `🎈 Saltimbanque` : moderation legere avec kick, sans ban.
-- `🤡 Klown` : permissions standards.
-- `🚪 Visiteur` : acces limite au sas d'entree.
+- The Klown
+- The Kween
+- The Kool
+- Saltimbanque
+- Klown
+- Visiteur
 
-## Categories
+## Structure serveur
 
-- `🚪・Vestibule`
-- `👑・Le Trône`
-- `🎪・Le Chapiteau`
-- `📰・Gazette des Klowns`
-- `☠️・The Real KKK`
-- `🎉・Loge des Klowns`
-- `🔒・Coulisses du Chapiteau`
-- `🔒・Logs`
+- Vestibule
+- Le Trone
+- Gazette des Klowns
+- Le Chapiteau
+- Loge des Klowns
+- Coulisses du Chapiteau
+- Logs
 
 ## Installation
 
@@ -42,7 +38,7 @@ Bot Discord.js v14 pour configurer le serveur Discord de la guilde **Kool Klown 
 npm install
 ```
 
-Copie `.env.example` vers `.env`, puis remplis :
+Copier `.env.example` vers `.env`, puis remplir :
 
 ```env
 DISCORD_TOKEN=ton_token_bot
@@ -56,9 +52,12 @@ GUILD_ID=id_du_serveur
 npm start
 ```
 
-Quand le bot est connecte, les commandes slash sont disponibles sur le serveur configure dans `GUILD_ID`.
+## Hebergement
 
-## Notes
+Le bot est prevu pour tourner sur Render avec un health check HTTP.
 
-- Le role Discord gere automatiquement pour le bot doit etre place au-dessus des roles qu'il modifie.
-- Garde `.env` prive : il contient le token du bot.
+## Securite
+
+- `.env` doit rester prive.
+- Le role du bot Discord doit rester au-dessus des roles qu'il gere.
+- Les actions sensibles sont limitees aux roles autorises.
