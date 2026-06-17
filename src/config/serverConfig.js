@@ -122,6 +122,7 @@ export const memberRoleExcludedSearchTerms = ['wohlstand'];
 export const klownAutoAccessSearchTerms = ['wohlstand'];
 export const kweenAutoAccessSearchTerms = ['lisouille', 'jaliyha'];
 export const kweenAutoAccessUserIds = ['402512615387037713'];
+export const koolAutoAccessUserIds = ['293039760044195840'];
 export const tempVoiceConfig = {
   triggerChannelName: '\u2795\u30FBcree-ton-salon',
   parentCategoryName: '\u{1F389}\u30FBLoge des Klowns',

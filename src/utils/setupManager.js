@@ -2,6 +2,7 @@ import { ChannelType } from 'discord.js';
 import {
   categoryDefinitions,
   klownAutoAccessSearchTerms,
+  koolAutoAccessUserIds,
   kweenAutoAccessSearchTerms,
   kweenAutoAccessUserIds,
   legacyRoleNames,
@@ -182,6 +183,10 @@ function getsAutoKlownAccess(member) {
   return memberMatchesTerms(member, klownAutoAccessSearchTerms);
 }
 
+function getsAutoKoolAccess(member) {
+  return koolAutoAccessUserIds.includes(member.id);
+}
+
 function isConfiguredThroneChannel(channel) {
   const throneDefinition = categoryDefinitions.find((category) => category.key === 'throne');
   const throneChannelNames = new Set([
@@ -290,6 +295,9 @@ async function ensureAutoAccess(guild) {
   for (const member of guild.members.cache.filter(getsAutoKweenAccess).values()) {
     await grantKweenAccess(member);
   }
+  for (const member of guild.members.cache.filter(getsAutoKoolAccess).values()) {
+    await grantKoolAccess(member);
+  }
 }
 
 async function deleteDefaultChannels(guild) {
@@ -356,6 +364,11 @@ export async function grantMemberAccess(member) {
     return { memberRole, visitorRole, klownRole, skipDm: true };
   }
 
+  if (getsAutoKoolAccess(member)) {
+    await grantKoolAccess(member);
+    return { memberRole, visitorRole, skipDm: true };
+  }
+
   if (!memberRole) {
     throw new Error(`Role introuvable: ${roleNames.membre}`);
   }
@@ -389,6 +402,11 @@ export async function grantVisitorAccess(member) {
   if (getsAutoKlownAccess(member)) {
     await grantKlownAccess(member);
     return { visitorRole, memberRole, klownRole, skipRules: true };
+  }
+
+  if (getsAutoKoolAccess(member)) {
+    await grantKoolAccess(member);
+    return { visitorRole, memberRole, skipRules: true };
   }
 
   if (getsAutoKweenAccess(member)) {
@@ -438,5 +456,21 @@ async function grantKweenAccess(member) {
   }
   if (memberRole && member.roles.cache.has(memberRole.id)) {
     await member.roles.remove(memberRole, 'Exception role The Kween');
+  }
+}
+
+async function grantKoolAccess(member) {
+  const visitorRole = member.guild.roles.cache.find((role) => role.name === roleNames.visiteur);
+  const memberRole = member.guild.roles.cache.find((role) => role.name === roleNames.membre);
+  const koolRole = member.guild.roles.cache.find((role) => role.name === roleNames.kool);
+
+  if (koolRole && !member.roles.cache.has(koolRole.id)) {
+    await member.roles.add(koolRole, 'Acces automatique The Kool');
+  }
+  if (visitorRole && member.roles.cache.has(visitorRole.id)) {
+    await member.roles.remove(visitorRole, 'Acces automatique The Kool');
+  }
+  if (memberRole && member.roles.cache.has(memberRole.id)) {
+    await member.roles.remove(memberRole, 'Exception role The Kool');
   }
 }
