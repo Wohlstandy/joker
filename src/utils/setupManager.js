@@ -1,9 +1,8 @@
 import { ChannelType } from 'discord.js';
 import {
   categoryDefinitions,
-  klownAutoAccessSearchTerms,
+  klownAutoAccessUserIds,
   koolAutoAccessUserIds,
-  kweenAutoAccessSearchTerms,
   kweenAutoAccessUserIds,
   legacyRoleNames,
   memberRoleExcludedSearchTerms,
@@ -176,11 +175,11 @@ function isExcludedFromMemberRole(member) {
 }
 
 function getsAutoKweenAccess(member) {
-  return kweenAutoAccessUserIds.includes(member.id) || memberMatchesTerms(member, kweenAutoAccessSearchTerms);
+  return kweenAutoAccessUserIds.includes(member.id);
 }
 
 function getsAutoKlownAccess(member) {
-  return memberMatchesTerms(member, klownAutoAccessSearchTerms);
+  return klownAutoAccessUserIds.includes(member.id);
 }
 
 function getsAutoKoolAccess(member) {
