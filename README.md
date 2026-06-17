@@ -58,10 +58,10 @@ Bot Discord.js v14 pour maintenir le serveur Discord de la guilde **Kool Klown K
 
 ### 🔒・Coulisses du Chapiteau
 
-- 🔊・Staff
 - 📝・staff
 - 📊・gestion-guilde
 - 🚨・sanctions
+- 🔊・Staff
 
 ### 🔒・Logs
 

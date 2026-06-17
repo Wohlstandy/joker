@@ -278,11 +278,6 @@ export const categoryDefinitions = [
     access: 'staff',
     children: [
       {
-        key: 'staffVoice',
-        name: '\u{1F50A}\u30FBStaff',
-        type: ChannelType.GuildVoice
-      },
-      {
         key: 'staffChat',
         name: '\u{1F4DD}\u30FBstaff',
         type: ChannelType.GuildText,
@@ -299,6 +294,11 @@ export const categoryDefinitions = [
         name: '\u{1F6A8}\u30FBsanctions',
         type: ChannelType.GuildText,
         topic: 'Suivi administratif des sanctions.'
+      },
+      {
+        key: 'staffVoice',
+        name: '\u{1F50A}\u30FBStaff',
+        type: ChannelType.GuildVoice
       }
     ]
   },
