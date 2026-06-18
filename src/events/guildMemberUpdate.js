@@ -14,13 +14,13 @@ export default {
     }
 
     const changes = [
-      added.size ? `Ajoutes: ${added.map((role) => role.name).join(', ')}` : null,
-      removed.size ? `Retires: ${removed.map((role) => role.name).join(', ')}` : null
+      added.size ? `Ajoutés: ${added.map((role) => role.name).join(', ')}` : null,
+      removed.size ? `Retirés: ${removed.map((role) => role.name).join(', ')}` : null
     ].filter(Boolean);
 
     await logAction(
       newMember.guild,
-      '\u{1F4CB} Roles modifies',
+      '\u{1F4CB} Rôles modifiés',
       `${newMember} | ${changes.join('\n')}`,
       0x3498db
     );

@@ -37,7 +37,7 @@ export default {
     await logAction(
       interaction.guild,
       '\u{1F6AA} Kick',
-      `${interaction.user} a expulse **${user.tag}**.\nRaison: ${reason}`,
+      `${interaction.user} a expulsé **${user.tag}**.\nRaison: ${reason}`,
       0xe74c3c
     );
 

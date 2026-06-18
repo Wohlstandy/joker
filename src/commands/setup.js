@@ -15,8 +15,8 @@ export default {
     const { roles, channels } = await runSetup(interaction.guild, { createMissing: true });
     await logAction(
       interaction.guild,
-      '\u{1F6E0}\uFE0F Setup execute',
-      `${interaction.user} a configure ${roles.size} roles suivis et ${Object.keys(channels).length} salons/categories.`
+      '\u{1F6E0}\uFE0F Setup exécuté',
+      `${interaction.user} a configuré ${roles.size} rôles suivis et ${Object.keys(channels).length} salons/catégories.`
     );
 
     await interaction.deleteReply().catch(() => null);

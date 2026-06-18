@@ -42,8 +42,8 @@ export default {
       }
       await logAction(
         interaction.guild,
-        '\u2705 Reglement accepte',
-        `${interaction.user} a accepte le reglement et rejoint la troupe.`
+        '\u2705 Règlement accepté',
+        `${interaction.user} a accepté le règlement et rejoint la troupe.`
       );
       await interaction.editReply('Reglement accepte. Bienvenue dans Kool Klown Klanx !');
     } catch (error) {

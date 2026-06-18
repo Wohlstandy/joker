@@ -6,6 +6,6 @@ export default {
 
   async execute(member) {
     await logMemberExit(member);
-    await logAction(member.guild, '\u{1F44B} Depart', `**${member.user.tag}** a quitte le serveur.`, 0xf39c12);
+    await logAction(member.guild, '\u{1F44B} Départ', `**${member.user.tag}** a quitté le serveur.`, 0xf39c12);
   }
 };

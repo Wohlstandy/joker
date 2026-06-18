@@ -11,12 +11,12 @@ export default {
       console.error(error);
       await logAction(
         member.guild,
-        '\u26A0\uFE0F Erreur arrivee',
-        `Impossible d'ajouter le role visiteur a ${member}: ${error.message}`,
+        '\u26A0\uFE0F Erreur arrivée',
+        `Impossible d'ajouter le rôle visiteur à ${member}: ${error.message}`,
         0xe74c3c
       );
     }
 
-    await logAction(member.guild, '\u{1F44B} Arrivee', `${member} a rejoint le serveur.`);
+    await logAction(member.guild, '\u{1F44B} Arrivée', `${member} a rejoint le serveur.`);
   }
 };
