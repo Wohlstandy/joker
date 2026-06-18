@@ -91,7 +91,6 @@ npm start
 ## Hebergement
 
 - Render pour l'execution du bot.
-- GitHub Actions pour le keepalive.
 - Health check HTTP disponible sur l'URL Render.
 
 ## Securite

@@ -23,10 +23,6 @@ if (process.env.PORT) {
     res.writeHead(200, { 'Content-Type': 'text/plain' });
     res.end('ok');
   }).listen(Number(process.env.PORT), '0.0.0.0');
-
-  setInterval(() => {
-    fetch('https://kool-klown-klanx-discord-bot.onrender.com').catch(() => null);
-  }, 5 * 60 * 1000).unref();
 }
 
 const client = new Client({
