@@ -2,20 +2,12 @@ name: Render Ping
 
 on:
   schedule:
-    - cron: "0 */6 * * *"
+    - cron: "*/5 * * * *"
   workflow_dispatch:
-
-concurrency:
-  group: render-ping
-  cancel-in-progress: true
 
 jobs:
   ping:
     runs-on: ubuntu-latest
-    timeout-minutes: 360
+    timeout-minutes: 2
     steps:
-      - run: |
-          for i in {1..72}; do
-            curl -fsS https://kool-klown-klanx-discord-bot.onrender.com
-            sleep 300
-          done
+      - run: curl -fsS https://kool-klown-klanx-discord-bot.onrender.com
