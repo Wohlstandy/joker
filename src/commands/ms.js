@@ -10,7 +10,7 @@ export default {
         .setName('salon')
         .setDescription('Salon cible')
         .addChannelTypes(ChannelType.GuildText, ChannelType.GuildAnnouncement)
-        .setRequired(true)
+        .setRequired(false)
     )
     .addStringOption((option) =>
       option
@@ -28,7 +28,7 @@ export default {
       return;
     }
 
-    const channel = interaction.options.getChannel('salon', true);
+    const channel = interaction.options.getChannel('salon') ?? interaction.channel;
     const text = interaction.options.getString('texte', true);
 
     await channel.send({
