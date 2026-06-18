@@ -1,4 +1,6 @@
 import { logAction } from '../utils/logger.js';
+import { roleNames } from '../config/serverConfig.js';
+import { registerAutoMember } from '../utils/memberRegistry.js';
 
 export default {
   name: 'guildMemberUpdate',
@@ -11,6 +13,10 @@ export default {
 
     if (!added.size && !removed.size) {
       return;
+    }
+
+    if (added.some((role) => role.name === roleNames.membre)) {
+      await registerAutoMember(newMember);
     }
 
     const changes = [

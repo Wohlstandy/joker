@@ -11,6 +11,7 @@ import {
   trackedChannelNames,
   trackedRoleNames
 } from '../config/serverConfig.js';
+import { getAutoMemberIds, registerAutoMember, rememberCurrentMembers } from './memberRegistry.js';
 import { buildPermissionOverwrites } from './permissions.js';
 
 export const ACCEPT_RULES_CUSTOM_ID = 'accept_rules_ticket';
@@ -297,6 +298,29 @@ async function ensureAutoAccess(guild) {
   for (const member of guild.members.cache.filter(getsAutoKoolAccess).values()) {
     await grantKoolAccess(member);
   }
+  await grantRegisteredMemberAccess(guild);
+}
+
+async function grantRegisteredMemberAccess(guild) {
+  const memberRole = guild.roles.cache.find((role) => role.name === roleNames.membre);
+  const visitorRole = guild.roles.cache.find((role) => role.name === roleNames.visiteur);
+  if (!memberRole) {
+    return;
+  }
+
+  const ids = await getAutoMemberIds();
+  for (const id of ids) {
+    const member = await guild.members.fetch(id).catch(() => null);
+    if (!member || getsAutoKlownAccess(member) || getsAutoKoolAccess(member) || getsAutoKweenAccess(member)) {
+      continue;
+    }
+    if (!member.roles.cache.has(memberRole.id)) {
+      await member.roles.add(memberRole, 'Acces membre automatique');
+    }
+    if (visitorRole && member.roles.cache.has(visitorRole.id)) {
+      await member.roles.remove(visitorRole, 'Acces membre automatique');
+    }
+  }
 }
 
 async function deleteDefaultChannels(guild) {
@@ -318,6 +342,8 @@ async function deleteDefaultChannels(guild) {
 }
 
 export async function clearSetup(guild) {
+  await rememberCurrentMembers(guild);
+
   const deleted = {
     channels: 0,
     roles: 0
@@ -383,6 +409,7 @@ export async function grantMemberAccess(member) {
     }
   } else {
     await member.roles.add(memberRole, 'Validation du reglement Kool Klown Klanx');
+    await registerAutoMember(member);
   }
 
   if (visitorRole && member.roles.cache.has(visitorRole.id)) {
