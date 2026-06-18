@@ -1,6 +1,6 @@
 import { logAction } from '../utils/logger.js';
 import { roleNames } from '../config/serverConfig.js';
-import { registerAutoMember } from '../utils/memberRegistry.js';
+import { registerAutoMember, registerAutoSaltimbanque } from '../utils/memberRegistry.js';
 
 export default {
   name: 'guildMemberUpdate',
@@ -17,6 +17,10 @@ export default {
 
     if (added.some((role) => role.name === roleNames.membre)) {
       await registerAutoMember(newMember);
+    }
+
+    if (added.some((role) => role.name === roleNames.saltimbanque)) {
+      await registerAutoSaltimbanque(newMember);
     }
 
     const changes = [

@@ -11,7 +11,12 @@ import {
   trackedChannelNames,
   trackedRoleNames
 } from '../config/serverConfig.js';
-import { getAutoMemberIds, registerAutoMember, rememberCurrentMembers } from './memberRegistry.js';
+import {
+  getAutoMemberIds,
+  getAutoSaltimbanqueIds,
+  registerAutoMember,
+  rememberCurrentMembers
+} from './memberRegistry.js';
 import { buildPermissionOverwrites } from './permissions.js';
 
 export const ACCEPT_RULES_CUSTOM_ID = 'accept_rules_ticket';
@@ -299,6 +304,7 @@ async function ensureAutoAccess(guild) {
     await grantKoolAccess(member);
   }
   await grantRegisteredMemberAccess(guild);
+  await grantRegisteredSaltimbanqueAccess(guild);
 }
 
 async function grantRegisteredMemberAccess(guild) {
@@ -319,6 +325,32 @@ async function grantRegisteredMemberAccess(guild) {
     }
     if (visitorRole && member.roles.cache.has(visitorRole.id)) {
       await member.roles.remove(visitorRole, 'Acces membre automatique');
+    }
+  }
+}
+
+async function grantRegisteredSaltimbanqueAccess(guild) {
+  const saltimbanqueRole = guild.roles.cache.find((role) => role.name === roleNames.saltimbanque);
+  const visitorRole = guild.roles.cache.find((role) => role.name === roleNames.visiteur);
+  const memberRole = guild.roles.cache.find((role) => role.name === roleNames.membre);
+  if (!saltimbanqueRole) {
+    return;
+  }
+
+  const ids = await getAutoSaltimbanqueIds();
+  for (const id of ids) {
+    const member = await guild.members.fetch(id).catch(() => null);
+    if (!member || getsAutoKlownAccess(member) || getsAutoKoolAccess(member) || getsAutoKweenAccess(member)) {
+      continue;
+    }
+    if (!member.roles.cache.has(saltimbanqueRole.id)) {
+      await member.roles.add(saltimbanqueRole, 'Acces Saltimbanque automatique');
+    }
+    if (visitorRole && member.roles.cache.has(visitorRole.id)) {
+      await member.roles.remove(visitorRole, 'Acces Saltimbanque automatique');
+    }
+    if (memberRole && member.roles.cache.has(memberRole.id)) {
+      await member.roles.remove(memberRole, 'Acces Saltimbanque automatique');
     }
   }
 }
