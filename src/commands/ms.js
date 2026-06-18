@@ -5,18 +5,18 @@ export default {
   data: new SlashCommandBuilder()
     .setName('ms')
     .setDescription('Envoie un message avec Klown dans un salon.')
+    .addStringOption((option) =>
+      option
+        .setName('texte')
+        .setDescription('Message a envoyer')
+        .setRequired(true)
+    )
     .addChannelOption((option) =>
       option
         .setName('salon')
         .setDescription('Salon cible')
         .addChannelTypes(ChannelType.GuildText, ChannelType.GuildAnnouncement)
         .setRequired(false)
-    )
-    .addStringOption((option) =>
-      option
-        .setName('texte')
-        .setDescription('Message a envoyer')
-        .setRequired(true)
     )
     .setDMPermission(false),
 
