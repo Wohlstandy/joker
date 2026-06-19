@@ -7,14 +7,14 @@ const commands = [
     description: 'Affiche la liste des commandes du bot.'
   },
   {
-    name: '/setup',
-    access: 'Administrateur',
-    description: 'Configure tout le serveur Kool Klown Klanx.'
+    name: '/ms',
+    access: 'The Klown ou The Kool',
+    description: 'Envoie un message avec le bot dans un salon.'
   },
   {
-    name: '/clearsetup',
-    access: 'Administrateur',
-    description: 'Supprime uniquement les rôles et salons créés par le setup.'
+    name: '/del',
+    access: 'The Klown ou The Kool',
+    description: 'Supprime un message par ID.'
   },
   {
     name: '/membre',
@@ -27,14 +27,14 @@ const commands = [
     description: 'Expulse un utilisateur avec une raison et un log automatique.'
   },
   {
-    name: '/del',
-    access: 'The Klown ou The Kool',
-    description: 'Supprime un message par ID.'
+    name: '/setup',
+    access: 'Administrateur',
+    description: 'Configure tout le serveur Kool Klown Klanx.'
   },
   {
-    name: '/ms',
-    access: 'The Klown ou The Kool',
-    description: 'Envoie un message avec le bot dans un salon.'
+    name: '/clearsetup',
+    access: 'Administrateur',
+    description: 'Supprime uniquement les rôles et salons créés par le setup.'
   }
 ];
 
