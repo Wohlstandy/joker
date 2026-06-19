@@ -45,9 +45,9 @@ export default {
         '\u2705 Règlement accepté',
         `${interaction.user} a accepté le règlement et rejoint la troupe.`
       );
-      await interaction.editReply('Reglement accepte. Bienvenue dans Kool Klown Klanx !');
+      await interaction.editReply('Règlement accepté. Bienvenue dans Kool Klown Klanx !');
     } catch (error) {
-      await interaction.editReply(`Impossible de valider ton acces: ${error.message}`);
+      await interaction.editReply(`Impossible de valider ton accès: ${error.message}`);
     }
   }
 };

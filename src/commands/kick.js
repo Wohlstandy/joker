@@ -8,7 +8,7 @@ export default {
     .addUserOption((option) =>
       option
         .setName('utilisateur')
-        .setDescription('Utilisateur a expulser')
+        .setDescription('Utilisateur à expulser')
         .setRequired(true)
     )
     .addStringOption((option) =>
@@ -29,7 +29,7 @@ export default {
     const member = await interaction.guild.members.fetch(user.id);
 
     if (!member.kickable) {
-      await interaction.editReply("Impossible d'expulser cet utilisateur. Verifie la hierarchie des roles du bot.");
+      await interaction.editReply("Impossible d'expulser cet utilisateur. Vérifie la hiérarchie des rôles du bot.");
       return;
     }
 
@@ -41,6 +41,6 @@ export default {
       0xe74c3c
     );
 
-    await interaction.editReply(`${user.tag} a ete expulse. Raison: ${reason}`);
+    await interaction.editReply(`${user.tag} a été expulsé. Raison: ${reason}`);
   }
 };

@@ -17,7 +17,7 @@ export default {
     await interaction.deferReply({ ephemeral: true });
 
     if (!isKlownOrKool(interaction.member)) {
-      await interaction.editReply('Commande reservee a The Klown et The Kool.');
+      await interaction.editReply('Commande réservée à The Klown et The Kool.');
       return;
     }
 

@@ -8,7 +8,7 @@ export default {
     .addStringOption((option) =>
       option
         .setName('texte')
-        .setDescription('Message a envoyer')
+        .setDescription('Message à envoyer')
         .setRequired(true)
     )
     .addChannelOption((option) =>
@@ -24,7 +24,7 @@ export default {
     await interaction.deferReply({ ephemeral: true });
 
     if (!isKlownOrKool(interaction.member)) {
-      await interaction.editReply('Commande reservee a The Klown et The Kool.');
+      await interaction.editReply('Commande réservée à The Klown et The Kool.');
       return;
     }
 

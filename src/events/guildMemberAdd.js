@@ -1,4 +1,5 @@
 import { logAction } from '../utils/logger.js';
+import { logMemberEntry } from '../utils/memberFlowLogger.js';
 import { grantVisitorAccess } from '../utils/setupManager.js';
 
 export default {
@@ -17,6 +18,7 @@ export default {
       );
     }
 
+    await logMemberEntry(member);
     await logAction(member.guild, '\u{1F44B} Arrivée', `${member} a rejoint le serveur.`);
   }
 };

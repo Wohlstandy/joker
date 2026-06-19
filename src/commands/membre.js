@@ -6,11 +6,11 @@ import { grantMemberAccess } from '../utils/setupManager.js';
 export default {
   data: new SlashCommandBuilder()
     .setName('membre')
-    .setDescription('Donne manuellement le role Klown a un utilisateur.')
+    .setDescription('Donne manuellement le rôle Klown à un utilisateur.')
     .addUserOption((option) =>
       option
         .setName('utilisateur')
-        .setDescription('Utilisateur a valider')
+        .setDescription('Utilisateur à valider')
         .setRequired(true)
     )
     .setDefaultMemberPermissions(PermissionFlagsBits.ManageRoles)
@@ -30,9 +30,9 @@ export default {
     await logAction(
       interaction.guild,
       '\u2705 Validation manuelle',
-      `${interaction.user} a donne l'acces membre a ${member}.`
+      `${interaction.user} a donné l'accès membre à ${member}.`
     );
 
-    await interaction.editReply(`${member} a maintenant acces au serveur.`);
+    await interaction.editReply(`${member} a maintenant accès au serveur.`);
   }
 };

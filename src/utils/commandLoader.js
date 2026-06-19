@@ -39,9 +39,9 @@ export async function registerApplicationCommands(commands) {
 
   if (guildId) {
     await rest.put(Routes.applicationGuildCommands(clientId, guildId), { body });
-    return `Commandes slash enregistrees pour le serveur ${guildId}.`;
+    return `Commandes slash enregistrées pour le serveur ${guildId}.`;
   }
 
   await rest.put(Routes.applicationCommands(clientId), { body });
-  return 'Commandes slash globales enregistrees.';
+  return 'Commandes slash globales enregistrées.';
 }

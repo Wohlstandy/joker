@@ -7,6 +7,7 @@
   "scripts": {
     "start": "node src/index.js",
     "dev": "node --watch src/index.js",
+    "test": "node scripts/check-syntax.js",
     "test:welcome": "node scripts/test-welcome.js"
   },
   "keywords": [

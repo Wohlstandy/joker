@@ -4,7 +4,7 @@ import { clearSetup } from '../utils/setupManager.js';
 export default {
   data: new SlashCommandBuilder()
     .setName('clearsetup')
-    .setDescription('Supprime uniquement les roles et salons crees par le setup Kool Klown Klanx.')
+    .setDescription('Supprime uniquement les rôles et salons créés par le setup Kool Klown Klanx.')
     .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
     .setDMPermission(false),
 
@@ -14,7 +14,7 @@ export default {
     const deleted = await clearSetup(interaction.guild);
 
     await interaction.editReply(
-      `Nettoyage termine : ${deleted.channels} salon(s)/categorie(s) et ${deleted.roles} role(s) supprime(s).`
+      `Nettoyage terminé : ${deleted.channels} salon(s)/catégorie(s) et ${deleted.roles} rôle(s) supprimé(s).`
     );
   }
 };
