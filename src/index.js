@@ -65,6 +65,7 @@ client.once('clientReady', async () => {
 
 const commands = await loadCommands();
 client.commands = commands;
+console.log(`Commandes chargees: ${[...commands.keys()].sort().join(', ')}`);
 
 const registrationMessage = await registerApplicationCommands(commands);
 console.log(registrationMessage);

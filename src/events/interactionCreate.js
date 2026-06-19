@@ -10,6 +10,11 @@ export default {
       const command = client.commands.get(interaction.commandName);
 
       if (!command) {
+        console.warn(`Commande inconnue recue: ${interaction.commandName}`);
+        await interaction.reply({
+          content: 'Cette commande est enregistrée sur Discord, mais elle n’est pas chargée par le bot actif. Redéploie ou redémarre le service.',
+          ephemeral: true
+        }).catch(() => null);
         return;
       }
 
