@@ -53,14 +53,16 @@ export default {
     await interaction.deferReply({ ephemeral: true });
 
     try {
-      if (hasValidatedRole(interaction.member)) {
+      const member = await interaction.guild.members.fetch(interaction.user.id);
+
+      if (hasValidatedRole(member)) {
         await interaction.editReply('Ton acc\u00E8s est d\u00E9j\u00E0 valid\u00E9.');
         return;
       }
 
-      const access = await grantMemberAccess(interaction.member);
+      const access = await grantMemberAccess(member);
       if (!access.skipDm) {
-        await interaction.member.send(privateWelcomeDm).catch(() => null);
+        await member.send(privateWelcomeDm).catch(() => null);
       }
       await logAction(
         interaction.guild,
