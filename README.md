@@ -38,10 +38,10 @@ Bot Discord.js v14 pour maintenir le serveur Discord de la guilde **Kool Klown K
 - 👑・le-trône
 - 🔊・Le Trône
 
-### ☠️・The Real KKK
+### ☠️・The Real Klowns
 
 - ☠️・la-vérité
-- 🔺・KKK
+- 🔺・Klowns
 
 ### 📰・Gazette des Klowns
 

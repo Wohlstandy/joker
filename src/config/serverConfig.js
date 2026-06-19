@@ -175,7 +175,7 @@ export const categoryDefinitions = [
   },
   {
     key: 'management',
-    name: '\u2620\uFE0F\u30FBThe Real KKK',
+    name: '\u2620\uFE0F\u30FBThe Real Klowns',
     type: ChannelType.GuildCategory,
     access: 'koolOnly',
     children: [
@@ -187,7 +187,7 @@ export const categoryDefinitions = [
       },
       {
         key: 'koolKlownVoice',
-        name: '\u{1F53A}\u30FBKKK',
+        name: '\u{1F53A}\u30FBKlowns',
         type: ChannelType.GuildVoice
       }
     ]
