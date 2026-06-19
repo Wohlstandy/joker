@@ -1,6 +1,18 @@
-import { privateWelcomeDm } from '../config/serverConfig.js';
+import { privateWelcomeDm, roleNames } from '../config/serverConfig.js';
 import { logAction } from '../utils/logger.js';
 import { ACCEPT_RULES_CUSTOM_ID, grantMemberAccess } from '../utils/setupManager.js';
+
+const validatedRoleNames = new Set([
+  roleNames.klown,
+  roleNames.kool,
+  roleNames.queen,
+  roleNames.saltimbanque,
+  roleNames.membre
+]);
+
+function hasValidatedRole(member) {
+  return member.roles.cache.some((role) => validatedRoleNames.has(role.name));
+}
 
 export default {
   name: 'interactionCreate',
@@ -41,6 +53,11 @@ export default {
     await interaction.deferReply({ ephemeral: true });
 
     try {
+      if (hasValidatedRole(interaction.member)) {
+        await interaction.editReply('Ton acc\u00E8s est d\u00E9j\u00E0 valid\u00E9.');
+        return;
+      }
+
       const access = await grantMemberAccess(interaction.member);
       if (!access.skipDm) {
         await interaction.member.send(privateWelcomeDm).catch(() => null);
