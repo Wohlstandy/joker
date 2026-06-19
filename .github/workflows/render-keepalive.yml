@@ -2,12 +2,25 @@ name: Render KeepAlive
 
 on:
   schedule:
-    - cron: "*/10 * * * *"
+    - cron: "*/5 * * * *"
   workflow_dispatch:
+
+permissions:
+  contents: read
 
 jobs:
   ping:
     runs-on: ubuntu-latest
     steps:
       - name: Ping Render
-        run: curl -fsS https://kool-klown-klanx-discord-bot.onrender.com >/dev/null
+        run: |
+          curl \
+            --fail \
+            --silent \
+            --show-error \
+            --location \
+            --retry 3 \
+            --retry-delay 10 \
+            --max-time 30 \
+            --user-agent "github-actions-render-keepalive" \
+            https://kool-klown-klanx-discord-bot.onrender.com
