@@ -8,22 +8,22 @@ const commands = [
   },
   {
     name: '/ms',
-    access: 'The Klown ou The Kool',
+    access: 'Administrateur',
     description: 'Envoie un message avec le bot dans un salon.'
   },
   {
     name: '/del',
-    access: 'The Klown ou The Kool',
+    access: 'Administrateur',
     description: 'Supprime un message par ID.'
   },
   {
     name: '/membre',
-    access: 'Admin ou modérateur avec gestion des rôles',
+    access: 'Administrateur ou modérateur avec gestion des rôles',
     description: 'Donne manuellement le rôle Klown à un utilisateur.'
   },
   {
     name: '/kick',
-    access: 'Admin ou modérateur avec expulsion',
+    access: 'Administrateur ou modérateur avec expulsion',
     description: 'Expulse un utilisateur avec une raison et un log automatique.'
   },
   {
