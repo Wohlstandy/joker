@@ -4,58 +4,90 @@ import { repairAccess } from '../utils/setupManager.js';
 
 function formatSummary(summary) {
   return [
-    `Rôles synchronisés : ${summary.roles}`,
-    `Sauvegardes vérifiées : ${summary.restored.checked}`,
-    `Rôles restaurés : ${summary.restored.restored}`,
-    `Restaurations ignorées : ${summary.restored.skipped}`,
+    `R\u00f4les synchronis\u00e9s : ${summary.roles}`,
+    `Sauvegardes v\u00e9rifi\u00e9es : ${summary.restored.checked}`,
+    `R\u00f4les restaur\u00e9s : ${summary.restored.restored}`,
+    `Restaurations ignor\u00e9es : ${summary.restored.skipped}`,
     `Erreurs restauration : ${summary.restored.failed}`,
-    `Visiteurs ajoutés : ${summary.visitors.granted}`,
-    `Visiteurs ignorés : ${summary.visitors.skipped}`,
+    `Visiteurs ajout\u00e9s : ${summary.visitors.granted}`,
+    `Visiteurs ignor\u00e9s : ${summary.visitors.skipped}`,
     `Erreurs visiteurs : ${summary.visitors.failed}`
   ].join('\n');
 }
 
 function buildRepairLogEmbed(interaction, summary) {
   const hasError = summary.restored.failed > 0 || summary.visitors.failed > 0;
+  const restoredSomething = summary.restored.restored > 0 || summary.visitors.granted > 0;
+  const untouchedSaved = Math.max(0, summary.restored.checked - summary.restored.restored - summary.restored.failed);
+  const untouchedVisitors = Math.max(0, summary.visitors.checked - summary.visitors.granted - summary.visitors.failed);
+  const title = hasError
+    ? 'R\u00e9paration \u00e0 v\u00e9rifier'
+    : restoredSomething
+      ? 'R\u00e9paration effectu\u00e9e'
+      : 'Aucune r\u00e9paration n\u00e9cessaire';
+  const color = hasError ? 0xe67e22 : restoredSomething ? 0x3498db : 0x2ecc71;
+  const status = hasError
+    ? 'Le bot a termin\u00e9, mais au moins une action a \u00e9chou\u00e9.'
+    : restoredSomething
+      ? 'Le bot a corrig\u00e9 les acc\u00e8s manquants.'
+      : 'Tout \u00e9tait d\u00e9j\u00e0 correct.';
+
+  const fields = [
+    {
+      name: 'R\u00e9sum\u00e9',
+      value: [
+        status,
+        `Commande lanc\u00e9e par ${interaction.user}`
+      ].join('\n'),
+      inline: false
+    },
+    {
+      name: 'R\u00f4les du setup',
+      value: `${summary.roles} r\u00f4les v\u00e9rifi\u00e9s et resynchronis\u00e9s.`,
+      inline: false
+    },
+    {
+      name: 'Acc\u00e8s sauvegard\u00e9s',
+      value: summary.restored.checked > 0
+        ? (
+          restoredSomething || hasError
+            ? [
+              `${summary.restored.checked} utilisateur(s) dans la sauvegarde.`,
+              `${summary.restored.restored} r\u00f4le(s) restaur\u00e9(s).`,
+              `${untouchedSaved} d\u00e9j\u00e0 correct(s) ou non concern\u00e9(s).`,
+              `${summary.restored.failed} erreur(s).`
+            ].join('\n')
+            : `${summary.restored.checked} utilisateur(s) sauvegard\u00e9(s), aucun r\u00f4le manquant.`
+        )
+        : 'Aucun utilisateur dans la sauvegarde.',
+      inline: false
+    },
+    {
+      name: 'Visiteurs',
+      value: summary.visitors.granted > 0 || hasError
+        ? [
+          `${summary.visitors.checked} membre(s) v\u00e9rifi\u00e9(s).`,
+          `${summary.visitors.granted} visiteur(s) ajout\u00e9(s).`,
+          `${untouchedVisitors} d\u00e9j\u00e0 correct(s) ou non concern\u00e9(s).`,
+          `${summary.visitors.failed} erreur(s).`
+        ].join('\n')
+        : `${summary.visitors.checked} membre(s) v\u00e9rifi\u00e9(s), aucun visiteur \u00e0 ajouter.`,
+      inline: false
+    }
+  ];
+
+  if (hasError) {
+    fields.push({
+      name: '\u00c0 v\u00e9rifier',
+      value: 'Place le r\u00f4le du bot au-dessus des r\u00f4les g\u00e9r\u00e9s et v\u00e9rifie la permission G\u00e9rer les r\u00f4les.',
+      inline: false
+    });
+  }
 
   return new EmbedBuilder()
-    .setColor(hasError ? 0xe67e22 : 0x2ecc71)
-    .setTitle(hasError ? 'Réparation terminée avec erreur' : 'Réparation terminée')
-    .setDescription(`Commande lancée par ${interaction.user}`)
-    .addFields(
-      {
-        name: 'Rôles',
-        value: `Synchronisés : **${summary.roles}**`,
-        inline: true
-      },
-      {
-        name: 'Sauvegarde',
-        value: [
-          `Vérifiés : **${summary.restored.checked}**`,
-          `Restaurés : **${summary.restored.restored}**`,
-          `Ignorés : **${summary.restored.skipped}**`,
-          `Erreurs : **${summary.restored.failed}**`
-        ].join('\n'),
-        inline: true
-      },
-      {
-        name: 'Visiteurs',
-        value: [
-          `Vérifiés : **${summary.visitors.checked}**`,
-          `Ajoutés : **${summary.visitors.granted}**`,
-          `Ignorés : **${summary.visitors.skipped}**`,
-          `Erreurs : **${summary.visitors.failed}**`
-        ].join('\n'),
-        inline: true
-      },
-      {
-        name: 'Statut',
-        value: hasError
-          ? 'Des erreurs ont été rencontrées. Vérifie les permissions et la hiérarchie du bot.'
-          : 'Tout est à jour.',
-        inline: false
-      }
-    )
+    .setColor(color)
+    .setTitle(title)
+    .addFields(fields)
     .setTimestamp();
 }
 
@@ -74,6 +106,6 @@ export default {
 
     await logEmbed(interaction.guild, buildRepairLogEmbed(interaction, summary));
 
-    await interaction.editReply(`Réparation terminée.\n\`\`\`\n${message}\n\`\`\``);
+    await interaction.editReply(`R\u00e9paration termin\u00e9e.\n\`\`\`\n${message}\n\`\`\``);
   }
 };
