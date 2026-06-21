@@ -82,7 +82,7 @@ export const roleDefinitions = [
   {
     key: 'visiteur',
     name: roleNames.visiteur,
-    color: 0x95a5a6,
+    color: 0xf1c40f,
     permissions: [],
     hoist: true
   }
