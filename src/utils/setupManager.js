@@ -31,6 +31,7 @@ export async function ensureRoles(guild) {
     const existing = roles.get(definition.name);
     if (existing) {
       await existing.edit({
+        colors: { primaryColor: definition.color },
         permissions: definition.permissions,
         hoist: definition.hoist,
         mentionable: true,
