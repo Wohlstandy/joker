@@ -17,23 +17,41 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     env:
-      RENDER_KEEPALIVE_URL: ${{ vars.RENDER_KEEPALIVE_URL || 'https://kool-klown-klanx-discord-bot.onrender.com' }}
+      RENDER_KEEPALIVE_URLS: ${{ vars.RENDER_KEEPALIVE_URLS || 'https://joker.onrender.com https://kool-klown-klanx-discord-bot.onrender.com' }}
     steps:
       - name: Ping Render
         run: |
           set -euo pipefail
 
-          for path in /health /; do
-            curl \
+          for base_url in ${RENDER_KEEPALIVE_URLS}; do
+            echo "Trying ${base_url}"
+            if curl \
               --fail \
               --silent \
               --show-error \
               --location \
-              --retry 8 \
+              --retry 3 \
               --retry-all-errors \
-              --retry-delay 15 \
+              --retry-delay 10 \
               --connect-timeout 20 \
               --max-time 120 \
               --user-agent "github-actions-render-keepalive" \
-              "${RENDER_KEEPALIVE_URL}${path}"
+              "${base_url}/health"; then
+              curl \
+                --fail \
+                --silent \
+                --show-error \
+                --location \
+                --retry 3 \
+                --retry-all-errors \
+                --retry-delay 10 \
+                --connect-timeout 20 \
+                --max-time 120 \
+                --user-agent "github-actions-render-keepalive" \
+                "${base_url}/"
+              exit 0
+            fi
           done
+
+          echo "No Render keepalive URL responded successfully."
+          exit 1
