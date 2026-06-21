@@ -19,3 +19,12 @@ export async function logAction(guild, title, description, color = 0x2ecc71) {
 
   await channel.send({ embeds: [embed] }).catch(() => null);
 }
+
+export async function logEmbed(guild, embed) {
+  const channel = await findLogChannel(guild);
+  if (!channel) {
+    return;
+  }
+
+  await channel.send({ embeds: [embed] }).catch(() => null);
+}
