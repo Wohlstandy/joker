@@ -128,8 +128,9 @@ npm test
 ## Hébergement
 
 - Render pour l'exécution du bot.
-- Health check HTTP disponible sur l'URL Render quand `PORT` est défini.
-- GitHub Actions ping l'URL Render toutes les 10 minutes.
+- Instance Render `free`; Render peut la mettre en veille après 15 minutes sans trafic entrant.
+- Health check HTTP disponible sur `/health` quand `PORT` est défini.
+- GitHub Actions ping l'URL Render toutes les 5 minutes pour limiter la mise en veille.
 
 ## Sécurité
 
