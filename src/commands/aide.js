@@ -60,7 +60,7 @@ export default {
   async execute(interaction) {
     const embed = new EmbedBuilder()
       .setColor(0xe67e22)
-      .setTitle('Commandes Kool Klown Klanx')
+      .setTitle('Commandes du bot')
       .setDescription(commands.map(formatCommand).join('\n\n'))
       .setFooter({ text: 'Les permissions Discord peuvent aussi limiter certaines commandes.' });
 
