@@ -204,9 +204,13 @@ export async function rememberCurrentMembers(guild) {
       continue;
     }
 
-    const savedRoles = trackedRoles.filter(({ role }) => member.roles.cache.has(role.id));
+    let savedRoles = trackedRoles.filter(({ role }) => member.roles.cache.has(role.id));
     if (!savedRoles.length) {
       continue;
+    }
+
+    if (savedRoles.some(({ key }) => key !== 'visiteur')) {
+      savedRoles = savedRoles.filter(({ key }) => key !== 'visiteur');
     }
 
     const user = ensureUser(registry, member.id);
