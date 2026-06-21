@@ -17,7 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     env:
-      RENDER_KEEPALIVE_URLS: ${{ vars.RENDER_KEEPALIVE_URLS || 'https://joker.onrender.com https://kool-klown-klanx-discord-bot.onrender.com' }}
+      RENDER_KEEPALIVE_URLS: ${{ vars.RENDER_KEEPALIVE_URLS || 'https://kool-klown-klanx-discord-bot.onrender.com' }}
     steps:
       - name: Ping Render
         run: |
