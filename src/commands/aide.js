@@ -39,7 +39,7 @@ const commands = [
   {
     name: '/repar',
     access: 'Administrateur',
-    description: 'Répare les accès sauvegardés et remet les visiteurs manquants.'
+    description: 'Répare les accès sauvegardés.'
   }
 ];
 
