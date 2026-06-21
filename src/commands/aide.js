@@ -35,6 +35,11 @@ const commands = [
     name: '/clearsetup',
     access: 'Administrateur',
     description: 'Supprime uniquement les rôles et salons créés par le setup.'
+  },
+  {
+    name: '/repar',
+    access: 'Administrateur',
+    description: 'Répare les accès sauvegardés et remet les visiteurs manquants.'
   }
 ];
 

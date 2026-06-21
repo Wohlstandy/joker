@@ -15,6 +15,7 @@ import {
   getAutoMemberIds,
   getAutoSaltimbanqueIds,
   getAutoVisitorIds,
+  getSavedRoleEntries,
   registerAutoMember,
   registerAutoVisitor,
   rememberCurrentMembers
@@ -255,6 +256,7 @@ export async function runSetup(guild, options = {}) {
   await deleteDefaultChannels(guild);
   const roles = await ensureRoles(guild);
   await ensureAutoAccess(guild);
+  await grantSavedRoleAccess(guild);
   await ensureVisitorAccessForPendingMembers(guild);
   const channels = await ensureChannels(guild, roles, { createMissing: options.createMissing === true });
   await ensureRulesAccess(guild, roles);
@@ -324,6 +326,56 @@ async function ensureAutoAccess(guild) {
   await grantRegisteredMemberAccess(guild);
   await grantRegisteredSaltimbanqueAccess(guild);
   await grantRegisteredVisitorAccess(guild);
+}
+
+async function grantSavedRoleAccess(guild) {
+  await guild.members.fetch().catch(() => null);
+  const rolesByKey = new Map(
+    roleDefinitions.map((definition) => [
+      definition.key,
+      guild.roles.cache.find((role) => role.name === definition.name)
+    ])
+  );
+  const entries = await getSavedRoleEntries();
+  const summary = {
+    checked: entries.length,
+    restored: 0,
+    skipped: 0,
+    failed: 0
+  };
+
+  for (const entry of entries) {
+    const member = await guild.members.fetch(entry.id).catch(() => null);
+    if (!member || member.user.bot || getsAutoKlownAccess(member) || getsAutoKoolAccess(member) || getsAutoKweenAccess(member)) {
+      summary.skipped += 1;
+      continue;
+    }
+
+    const roleKeys = new Set(entry.roles);
+    if ([...roleKeys].some((roleKey) => roleKey !== 'visiteur')) {
+      roleKeys.delete('visiteur');
+    }
+
+    for (const roleKey of roleKeys) {
+      const role = rolesByKey.get(roleKey);
+      if (!role) {
+        summary.failed += 1;
+        continue;
+      }
+
+      if (!member.roles.cache.has(role.id)) {
+        const added = await member.roles.add(role, 'Restauration acces sauvegarde').then(() => true).catch(() => {
+          summary.failed += 1;
+          return false;
+        });
+        if (added) {
+          summary.restored += 1;
+        }
+      }
+    }
+  }
+
+  return summary;
 }
 
 async function grantRegisteredMemberAccess(guild) {
@@ -454,6 +506,20 @@ export async function clearSetup(guild) {
   return deleted;
 }
 
+export async function repairAccess(guild) {
+  await ensureRoles(guild);
+  await rememberCurrentMembers(guild);
+  await ensureAutoAccess(guild);
+  const restored = await grantSavedRoleAccess(guild);
+  const visitors = await ensureVisitorAccessForPendingMembers(guild);
+
+  return {
+    roles: roleDefinitions.length,
+    restored,
+    visitors
+  };
+}
+
 export async function grantMemberAccess(member) {
   await member.guild.roles.fetch().catch(() => null);
 
@@ -553,14 +619,30 @@ export async function ensureVisitorAccessForPendingMembers(guild) {
   }
 
   await guild.members.fetch().catch(() => null);
+  const summary = {
+    checked: 0,
+    granted: 0,
+    skipped: 0,
+    failed: 0
+  };
 
   for (const member of guild.members.cache.values()) {
+    summary.checked += 1;
     if (member.user.bot || hasValidatedAccess(member) || member.roles.cache.has(visitorRole.id)) {
+      summary.skipped += 1;
       continue;
     }
 
-    await grantVisitorAccess(member);
+    await grantVisitorAccess(member)
+      .then(() => {
+        summary.granted += 1;
+      })
+      .catch(() => {
+        summary.failed += 1;
+      });
   }
+
+  return summary;
 }
 
 async function grantKlownAccess(member) {
