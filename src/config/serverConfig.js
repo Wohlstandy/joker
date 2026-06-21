@@ -105,7 +105,7 @@ export const rulesMessage = [
   '',
   '\u{1F39F}\uFE0F Si \u00E7a te va, valide ton ticket et rejoins la piste.',
   '',
-  "Clique sur \u2705 pour obtenir l'acc\u00E8s au serveur."
+  'Clique sur "Accepter le r\u00E8glement" pour obtenir l\'acc\u00E8s au serveur.'
 ].join('\n');
 
 export const privateWelcomeDm = [

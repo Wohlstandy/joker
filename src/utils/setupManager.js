@@ -14,7 +14,9 @@ import {
 import {
   getAutoMemberIds,
   getAutoSaltimbanqueIds,
+  getAutoVisitorIds,
   registerAutoMember,
+  registerAutoVisitor,
   rememberCurrentMembers
 } from './memberRegistry.js';
 import { buildPermissionOverwrites } from './permissions.js';
@@ -192,6 +194,20 @@ function getsAutoKoolAccess(member) {
   return koolAutoAccessUserIds.includes(member.id);
 }
 
+function findGuildRole(guild, roleName) {
+  return guild.roles.cache.find((role) => role.name === roleName);
+}
+
+function hasValidatedAccess(member) {
+  return member.roles.cache.some((role) =>
+    role.name === roleNames.membre ||
+    role.name === roleNames.saltimbanque ||
+    role.name === roleNames.kool ||
+    role.name === roleNames.klown ||
+    role.name === roleNames.queen
+  );
+}
+
 function isConfiguredThroneChannel(channel) {
   const throneDefinition = categoryDefinitions.find((category) => category.key === 'throne');
   const throneChannelNames = new Set([
@@ -305,11 +321,12 @@ async function ensureAutoAccess(guild) {
   }
   await grantRegisteredMemberAccess(guild);
   await grantRegisteredSaltimbanqueAccess(guild);
+  await grantRegisteredVisitorAccess(guild);
 }
 
 async function grantRegisteredMemberAccess(guild) {
-  const memberRole = guild.roles.cache.find((role) => role.name === roleNames.membre);
-  const visitorRole = guild.roles.cache.find((role) => role.name === roleNames.visiteur);
+  const memberRole = findGuildRole(guild, roleNames.membre);
+  const visitorRole = findGuildRole(guild, roleNames.visiteur);
   if (!memberRole) {
     return;
   }
@@ -330,9 +347,9 @@ async function grantRegisteredMemberAccess(guild) {
 }
 
 async function grantRegisteredSaltimbanqueAccess(guild) {
-  const saltimbanqueRole = guild.roles.cache.find((role) => role.name === roleNames.saltimbanque);
-  const visitorRole = guild.roles.cache.find((role) => role.name === roleNames.visiteur);
-  const memberRole = guild.roles.cache.find((role) => role.name === roleNames.membre);
+  const saltimbanqueRole = findGuildRole(guild, roleNames.saltimbanque);
+  const visitorRole = findGuildRole(guild, roleNames.visiteur);
+  const memberRole = findGuildRole(guild, roleNames.membre);
   if (!saltimbanqueRole) {
     return;
   }
@@ -351,6 +368,31 @@ async function grantRegisteredSaltimbanqueAccess(guild) {
     }
     if (memberRole && member.roles.cache.has(memberRole.id)) {
       await member.roles.remove(memberRole, 'Acces Saltimbanque automatique');
+    }
+  }
+}
+
+async function grantRegisteredVisitorAccess(guild) {
+  const visitorRole = findGuildRole(guild, roleNames.visiteur);
+  if (!visitorRole) {
+    return;
+  }
+
+  const ids = await getAutoVisitorIds();
+  for (const id of ids) {
+    const member = await guild.members.fetch(id).catch(() => null);
+    if (
+      !member ||
+      member.user.bot ||
+      hasValidatedAccess(member) ||
+      getsAutoKlownAccess(member) ||
+      getsAutoKoolAccess(member) ||
+      getsAutoKweenAccess(member)
+    ) {
+      continue;
+    }
+    if (!member.roles.cache.has(visitorRole.id)) {
+      await member.roles.add(visitorRole, 'Acces visiteur automatique');
     }
   }
 }
@@ -411,10 +453,12 @@ export async function clearSetup(guild) {
 }
 
 export async function grantMemberAccess(member) {
-  const memberRole = member.guild.roles.cache.find((role) => role.name === roleNames.membre);
-  const visitorRole = member.guild.roles.cache.find((role) => role.name === roleNames.visiteur);
-  const klownRole = member.guild.roles.cache.find((role) => role.name === roleNames.klown);
-  const kweenRole = member.guild.roles.cache.find((role) => role.name === roleNames.queen);
+  await member.guild.roles.fetch().catch(() => null);
+
+  const memberRole = findGuildRole(member.guild, roleNames.membre);
+  const visitorRole = findGuildRole(member.guild, roleNames.visiteur);
+  const klownRole = findGuildRole(member.guild, roleNames.klown);
+  const kweenRole = findGuildRole(member.guild, roleNames.queen);
 
   if (getsAutoKlownAccess(member)) {
     await grantKlownAccess(member);
@@ -452,10 +496,16 @@ export async function grantMemberAccess(member) {
 }
 
 export async function grantVisitorAccess(member) {
-  const visitorRole = member.guild.roles.cache.find((role) => role.name === roleNames.visiteur);
-  const memberRole = member.guild.roles.cache.find((role) => role.name === roleNames.membre);
-  const klownRole = member.guild.roles.cache.find((role) => role.name === roleNames.klown);
-  const kweenRole = member.guild.roles.cache.find((role) => role.name === roleNames.queen);
+  if (member.user.bot) {
+    return {};
+  }
+
+  await member.guild.roles.fetch().catch(() => null);
+
+  const visitorRole = findGuildRole(member.guild, roleNames.visiteur);
+  const memberRole = findGuildRole(member.guild, roleNames.membre);
+  const klownRole = findGuildRole(member.guild, roleNames.klown);
+  const kweenRole = findGuildRole(member.guild, roleNames.queen);
 
   if (getsAutoKlownAccess(member)) {
     await grantKlownAccess(member);
@@ -472,8 +522,13 @@ export async function grantVisitorAccess(member) {
     return { visitorRole, memberRole, kweenRole, skipRules: true };
   }
 
+  if (!visitorRole) {
+    throw new Error(`Role introuvable: ${roleNames.visiteur}. Lance /setup ou recree ce role.`);
+  }
+
   if (visitorRole && !member.roles.cache.has(visitorRole.id)) {
     await member.roles.add(visitorRole, 'Nouveau membre Kool Klown Klanx');
+    await registerAutoVisitor(member);
   }
 
   if (memberRole && member.roles.cache.has(memberRole.id)) {
@@ -483,12 +538,33 @@ export async function grantVisitorAccess(member) {
   if (memberRole && isExcludedFromMemberRole(member) && member.roles.cache.has(memberRole.id)) {
     await member.roles.remove(memberRole, 'Exclusion permanente du role Klown');
   }
+
+  return { visitorRole, memberRole };
+}
+
+export async function ensureVisitorAccessForPendingMembers(guild) {
+  await guild.roles.fetch().catch(() => null);
+  const visitorRole = findGuildRole(guild, roleNames.visiteur);
+
+  if (!visitorRole) {
+    throw new Error(`Role introuvable: ${roleNames.visiteur}. Lance /setup ou recree ce role.`);
+  }
+
+  await guild.members.fetch().catch(() => null);
+
+  for (const member of guild.members.cache.values()) {
+    if (member.user.bot || hasValidatedAccess(member) || member.roles.cache.has(visitorRole.id)) {
+      continue;
+    }
+
+    await grantVisitorAccess(member);
+  }
 }
 
 async function grantKlownAccess(member) {
-  const visitorRole = member.guild.roles.cache.find((role) => role.name === roleNames.visiteur);
-  const memberRole = member.guild.roles.cache.find((role) => role.name === roleNames.membre);
-  const klownRole = member.guild.roles.cache.find((role) => role.name === roleNames.klown);
+  const visitorRole = findGuildRole(member.guild, roleNames.visiteur);
+  const memberRole = findGuildRole(member.guild, roleNames.membre);
+  const klownRole = findGuildRole(member.guild, roleNames.klown);
 
   if (klownRole && !member.roles.cache.has(klownRole.id)) {
     await member.roles.add(klownRole, 'Acces automatique The Klown');
@@ -502,9 +578,9 @@ async function grantKlownAccess(member) {
 }
 
 async function grantKweenAccess(member) {
-  const visitorRole = member.guild.roles.cache.find((role) => role.name === roleNames.visiteur);
-  const memberRole = member.guild.roles.cache.find((role) => role.name === roleNames.membre);
-  const kweenRole = member.guild.roles.cache.find((role) => role.name === roleNames.queen);
+  const visitorRole = findGuildRole(member.guild, roleNames.visiteur);
+  const memberRole = findGuildRole(member.guild, roleNames.membre);
+  const kweenRole = findGuildRole(member.guild, roleNames.queen);
 
   if (kweenRole && !member.roles.cache.has(kweenRole.id)) {
     await member.roles.add(kweenRole, 'Acces automatique The Kween');
@@ -518,9 +594,9 @@ async function grantKweenAccess(member) {
 }
 
 async function grantKoolAccess(member) {
-  const visitorRole = member.guild.roles.cache.find((role) => role.name === roleNames.visiteur);
-  const memberRole = member.guild.roles.cache.find((role) => role.name === roleNames.membre);
-  const koolRole = member.guild.roles.cache.find((role) => role.name === roleNames.kool);
+  const visitorRole = findGuildRole(member.guild, roleNames.visiteur);
+  const memberRole = findGuildRole(member.guild, roleNames.membre);
+  const koolRole = findGuildRole(member.guild, roleNames.kool);
 
   if (koolRole && !member.roles.cache.has(koolRole.id)) {
     await member.roles.add(koolRole, 'Acces automatique The Kool');

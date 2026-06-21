@@ -10,19 +10,13 @@ import {
   Partials
 } from 'discord.js';
 import { loadCommands, registerApplicationCommands } from './utils/commandLoader.js';
+import { ensureVisitorAccessForPendingMembers } from './utils/setupManager.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 if (!process.env.DISCORD_TOKEN) {
   throw new Error('DISCORD_TOKEN est manquant. Copie .env.example vers .env puis ajoute le token du bot.');
-}
-
-if (process.env.PORT) {
-  http.createServer((_, res) => {
-    res.writeHead(200, { 'Content-Type': 'text/plain' });
-    res.end('ok');
-  }).listen(Number(process.env.PORT), '0.0.0.0');
 }
 
 const client = new Client({
@@ -37,6 +31,41 @@ const client = new Client({
 });
 
 client.commands = new Collection();
+
+if (process.env.PORT) {
+  const startedAt = new Date();
+  const server = http.createServer((req, res) => {
+    if (req.url === '/favicon.ico') {
+      res.writeHead(204);
+      res.end();
+      return;
+    }
+
+    const payload = JSON.stringify({
+      ok: true,
+      service: 'kool-klown-klanx-discord-bot',
+      discord: client.isReady() ? 'ready' : 'starting',
+      uptimeSeconds: Math.round(process.uptime()),
+      startedAt: startedAt.toISOString()
+    });
+
+    res.writeHead(200, {
+      'Content-Type': 'application/json; charset=utf-8',
+      'Cache-Control': 'no-store'
+    });
+
+    if (req.method === 'HEAD') {
+      res.end();
+      return;
+    }
+
+    res.end(payload);
+  });
+
+  server.listen(Number(process.env.PORT), '0.0.0.0', () => {
+    console.log(`Health check HTTP disponible sur le port ${process.env.PORT}`);
+  });
+}
 
 async function loadEvents() {
   const eventsPath = path.resolve(__dirname, 'events');
@@ -59,6 +88,12 @@ client.once('clientReady', async () => {
     activities: [],
     status: 'online'
   });
+
+  for (const guild of client.guilds.cache.values()) {
+    await ensureVisitorAccessForPendingMembers(guild).catch((error) => {
+      console.error(`Impossible de synchroniser le role visiteur pour ${guild.name}: ${error.message}`);
+    });
+  }
 
   console.log(`Connecte en tant que ${client.user.tag}`);
 });

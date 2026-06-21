@@ -10,17 +10,20 @@ async function readIds() {
     if (Array.isArray(data.ids)) {
       return {
         members: new Set(data.ids),
-        saltimbanques: new Set()
+        saltimbanques: new Set(),
+        visitors: new Set()
       };
     }
     return {
       members: new Set(Array.isArray(data.members) ? data.members : []),
-      saltimbanques: new Set(Array.isArray(data.saltimbanques) ? data.saltimbanques : [])
+      saltimbanques: new Set(Array.isArray(data.saltimbanques) ? data.saltimbanques : []),
+      visitors: new Set(Array.isArray(data.visitors) ? data.visitors : [])
     };
   } catch {
     return {
       members: new Set(),
-      saltimbanques: new Set()
+      saltimbanques: new Set(),
+      visitors: new Set()
     };
   }
 }
@@ -29,7 +32,8 @@ async function writeIds(registry) {
   await mkdir(path.dirname(registryPath), { recursive: true });
   await writeFile(registryPath, `${JSON.stringify({
     members: [...registry.members].sort(),
-    saltimbanques: [...registry.saltimbanques].sort()
+    saltimbanques: [...registry.saltimbanques].sort(),
+    visitors: [...registry.visitors].sort()
   }, null, 2)}\n`);
 }
 
@@ -48,6 +52,7 @@ export async function registerAutoMember(member) {
 
   const registry = await readIds();
   registry.members.add(member.id);
+  registry.visitors.delete(member.id);
   await writeIds(registry);
 }
 
@@ -58,6 +63,17 @@ export async function registerAutoSaltimbanque(member) {
 
   const registry = await readIds();
   registry.saltimbanques.add(member.id);
+  registry.visitors.delete(member.id);
+  await writeIds(registry);
+}
+
+export async function registerAutoVisitor(member) {
+  if (hasSpecialRole(member)) {
+    return;
+  }
+
+  const registry = await readIds();
+  registry.visitors.add(member.id);
   await writeIds(registry);
 }
 
@@ -66,6 +82,7 @@ export async function unregisterAutoMember(memberOrId) {
   const registry = await readIds();
   registry.members.delete(id);
   registry.saltimbanques.delete(id);
+  registry.visitors.delete(id);
   await writeIds(registry);
 }
 
@@ -77,11 +94,16 @@ export async function getAutoSaltimbanqueIds() {
   return (await readIds()).saltimbanques;
 }
 
+export async function getAutoVisitorIds() {
+  return (await readIds()).visitors;
+}
+
 export async function rememberCurrentMembers(guild) {
   await guild.members.fetch().catch(() => null);
   const memberRole = guild.roles.cache.find((role) => role.name === roleNames.membre);
   const saltimbanqueRole = guild.roles.cache.find((role) => role.name === roleNames.saltimbanque);
-  if (!memberRole && !saltimbanqueRole) {
+  const visitorRole = guild.roles.cache.find((role) => role.name === roleNames.visiteur);
+  if (!memberRole && !saltimbanqueRole && !visitorRole) {
     return;
   }
 
@@ -92,6 +114,9 @@ export async function rememberCurrentMembers(guild) {
     }
     if (saltimbanqueRole && member.roles.cache.has(saltimbanqueRole.id) && !hasSpecialRole(member)) {
       registry.saltimbanques.add(member.id);
+    }
+    if (visitorRole && member.roles.cache.has(visitorRole.id) && !hasSpecialRole(member)) {
+      registry.visitors.add(member.id);
     }
   }
   await writeIds(registry);
