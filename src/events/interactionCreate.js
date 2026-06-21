@@ -1,5 +1,6 @@
+import { EmbedBuilder } from 'discord.js';
 import { privateWelcomeDm, roleNames } from '../config/serverConfig.js';
-import { logAction } from '../utils/logger.js';
+import { logEmbed } from '../utils/logger.js';
 import { ACCEPT_RULES_CUSTOM_ID, grantMemberAccess } from '../utils/setupManager.js';
 
 const validatedRoleNames = new Set([
@@ -12,6 +13,26 @@ const validatedRoleNames = new Set([
 
 function hasValidatedRole(member) {
   return member.roles.cache.some((role) => validatedRoleNames.has(role.name));
+}
+
+function buildRulesAcceptedEmbed(interaction) {
+  return new EmbedBuilder()
+    .setColor(0x2ecc71)
+    .setTitle('Règlement accepté')
+    .setDescription(`${interaction.user} a validé le règlement.`)
+    .addFields(
+      {
+        name: 'Changement de rôle',
+        value: `${roleNames.visiteur} → ${roleNames.membre}`,
+        inline: false
+      },
+      {
+        name: 'Résultat',
+        value: 'Accès membre accordé.',
+        inline: false
+      }
+    )
+    .setTimestamp();
 }
 
 export default {
@@ -64,11 +85,7 @@ export default {
       if (!access.skipDm) {
         await member.send(privateWelcomeDm).catch(() => null);
       }
-      await logAction(
-        interaction.guild,
-        '\u2705 Règlement accepté',
-        `${interaction.user} a accepté le règlement et rejoint la troupe.`
-      );
+      await logEmbed(interaction.guild, buildRulesAcceptedEmbed(interaction));
       await interaction.editReply('Règlement accepté. Bienvenue dans Kool Klown Klanx !');
     } catch (error) {
       await interaction.editReply(`Impossible de valider ton accès: ${error.message}`);
