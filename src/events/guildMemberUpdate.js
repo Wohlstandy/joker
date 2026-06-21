@@ -31,7 +31,7 @@ function buildReturnedVisitorEmbed(member) {
   return new EmbedBuilder()
     .setColor(0xf1c40f)
     .setTitle('Retour en visiteur')
-    .setDescription(`${member} est repassé dans le sas.`)
+    .setDescription(`${member} est repassé dans le Vestibule.`)
     .addFields(
       {
         name: 'Changement de rôle',
