@@ -16,54 +16,46 @@ function formatSummary(summary) {
 }
 
 function buildRepairLogEmbed(interaction, summary) {
+  const hasError = summary.restored.failed > 0 || summary.visitors.failed > 0;
+
   return new EmbedBuilder()
-    .setColor(summary.restored.failed || summary.visitors.failed ? 0xe67e22 : 0x2ecc71)
-    .setTitle('🔧 Réparation des accès')
-    .setDescription(
-      [
-        `${interaction.user} a lancé la commande **/repar**.`,
-        '',
-        'Cette commande remet le serveur dans un état propre sans supprimer les salons : elle synchronise les rôles, relit la sauvegarde des accès, restaure les rôles manquants et replace les nouveaux arrivants sans rôle dans le sas **Visiteur**.'
-      ].join('\n')
-    )
+    .setColor(hasError ? 0xe67e22 : 0x2ecc71)
+    .setTitle(hasError ? 'Réparation terminée avec erreur' : 'Réparation terminée')
+    .setDescription(`Commande lancée par ${interaction.user}`)
     .addFields(
       {
-        name: 'Rôles du setup',
-        value: [
-          `**${summary.roles}** rôles suivis ont été vérifiés.`,
-          'Les couleurs, permissions, affichage séparé et mentionabilité sont resynchronisés.'
-        ].join('\n'),
-        inline: false
+        name: 'Rôles',
+        value: `Synchronisés : **${summary.roles}**`,
+        inline: true
       },
       {
-        name: 'Sauvegarde des accès',
+        name: 'Sauvegarde',
         value: [
-          `Utilisateurs sauvegardés vérifiés : **${summary.restored.checked}**`,
-          `Rôles restaurés : **${summary.restored.restored}**`,
-          `Restaurations ignorées : **${summary.restored.skipped}**`,
+          `Vérifiés : **${summary.restored.checked}**`,
+          `Restaurés : **${summary.restored.restored}**`,
+          `Ignorés : **${summary.restored.skipped}**`,
           `Erreurs : **${summary.restored.failed}**`
         ].join('\n'),
         inline: true
       },
       {
-        name: 'Sas Visiteur',
+        name: 'Visiteurs',
         value: [
-          `Membres vérifiés : **${summary.visitors.checked}**`,
-          `Visiteurs ajoutés : **${summary.visitors.granted}**`,
-          `Déjà corrects ou non concernés : **${summary.visitors.skipped}**`,
+          `Vérifiés : **${summary.visitors.checked}**`,
+          `Ajoutés : **${summary.visitors.granted}**`,
+          `Ignorés : **${summary.visitors.skipped}**`,
           `Erreurs : **${summary.visitors.failed}**`
         ].join('\n'),
         inline: true
       },
       {
-        name: 'Résultat',
-        value: summary.restored.failed || summary.visitors.failed
-          ? 'Réparation terminée avec au moins une erreur. Vérifie la hiérarchie des rôles du bot et ses permissions.'
-          : 'Réparation terminée correctement. Les accès sauvegardés et les visiteurs sont à jour.',
+        name: 'Statut',
+        value: hasError
+          ? 'Des erreurs ont été rencontrées. Vérifie les permissions et la hiérarchie du bot.'
+          : 'Tout est à jour.',
         inline: false
       }
     )
-    .setFooter({ text: 'Kool Klown Klanx • réparation automatique des accès' })
     .setTimestamp();
 }
 
