@@ -2,6 +2,21 @@ import { logAction } from '../utils/logger.js';
 import { roleNames } from '../config/serverConfig.js';
 import { registerAutoMember, registerAutoSaltimbanque } from '../utils/memberRegistry.js';
 
+function isValidationRoleChange(added, removed) {
+  const changedRoleNames = [
+    ...added.map((role) => role.name),
+    ...removed.map((role) => role.name)
+  ];
+
+  return changedRoleNames.every((roleName) =>
+    roleName === roleNames.membre ||
+    roleName === roleNames.visiteur
+  ) && (
+    added.some((role) => role.name === roleNames.membre) ||
+    removed.some((role) => role.name === roleNames.visiteur)
+  );
+}
+
 export default {
   name: 'guildMemberUpdate',
 
@@ -21,6 +36,10 @@ export default {
 
     if (added.some((role) => role.name === roleNames.saltimbanque)) {
       await registerAutoSaltimbanque(newMember);
+    }
+
+    if (isValidationRoleChange(added, removed)) {
+      return;
     }
 
     const changes = [
