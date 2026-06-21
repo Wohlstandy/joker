@@ -15,16 +15,16 @@ function formatSummary(summary) {
   ].join('\n');
 }
 
-function buildRepairLogEmbed(interaction, summary) {
+export function buildRepairLogEmbed(interaction, summary) {
   const hasError = summary.restored.failed > 0 || summary.visitors.failed > 0;
   const restoredSomething = summary.restored.restored > 0 || summary.visitors.granted > 0;
   const untouchedSaved = Math.max(0, summary.restored.checked - summary.restored.restored - summary.restored.failed);
   const untouchedVisitors = Math.max(0, summary.visitors.checked - summary.visitors.granted - summary.visitors.failed);
   const title = hasError
-    ? 'R\u00e9paration \u00e0 v\u00e9rifier'
+    ? '\u26a0\ufe0f R\u00e9paration \u00e0 v\u00e9rifier'
     : restoredSomething
-      ? 'R\u00e9paration effectu\u00e9e'
-      : 'Aucune r\u00e9paration n\u00e9cessaire';
+      ? '\u{1f527} R\u00e9paration effectu\u00e9e'
+      : '\u2705 Aucune r\u00e9paration n\u00e9cessaire';
   const color = hasError ? 0xe67e22 : restoredSomething ? 0x3498db : 0x2ecc71;
   const status = hasError
     ? 'Le bot a termin\u00e9, mais au moins une action a \u00e9chou\u00e9.'
@@ -34,7 +34,7 @@ function buildRepairLogEmbed(interaction, summary) {
 
   const fields = [
     {
-      name: 'R\u00e9sum\u00e9',
+      name: '\u{1f4cc} R\u00e9sum\u00e9',
       value: [
         status,
         `Commande lanc\u00e9e par ${interaction.user}`
@@ -42,12 +42,12 @@ function buildRepairLogEmbed(interaction, summary) {
       inline: false
     },
     {
-      name: 'R\u00f4les du setup',
+      name: '\u{1f3ad} R\u00f4les du setup',
       value: `${summary.roles} r\u00f4les v\u00e9rifi\u00e9s et resynchronis\u00e9s.`,
       inline: false
     },
     {
-      name: 'Acc\u00e8s sauvegard\u00e9s',
+      name: '\u{1f4be} Acc\u00e8s sauvegard\u00e9s',
       value: summary.restored.checked > 0
         ? (
           restoredSomething || hasError
@@ -63,7 +63,7 @@ function buildRepairLogEmbed(interaction, summary) {
       inline: false
     },
     {
-      name: 'Visiteurs',
+      name: '\u{1f6aa} Visiteurs',
       value: summary.visitors.granted > 0 || hasError
         ? [
           `${summary.visitors.checked} membre(s) v\u00e9rifi\u00e9(s).`,
@@ -78,7 +78,7 @@ function buildRepairLogEmbed(interaction, summary) {
 
   if (hasError) {
     fields.push({
-      name: '\u00c0 v\u00e9rifier',
+      name: '\u{1f6e0}\ufe0f \u00c0 v\u00e9rifier',
       value: 'Place le r\u00f4le du bot au-dessus des r\u00f4les g\u00e9r\u00e9s et v\u00e9rifie la permission G\u00e9rer les r\u00f4les.',
       inline: false
     });
