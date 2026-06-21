@@ -313,7 +313,7 @@ export const categoryDefinitions = [
         name: logChannelName,
         type: ChannelType.GuildText,
         access: 'koolKlownOnly',
-        topic: 'Logs automatiques du bot Kool Klown Klanx.'
+        topic: 'Logs automatiques de Joker.'
       }
     ]
   }

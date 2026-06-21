@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: kool-klown-klanx-discord-bot
+    name: joker
     runtime: node
     plan: free
     buildCommand: npm ci

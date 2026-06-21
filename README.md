@@ -1,4 +1,4 @@
-# Kool Klown Klanx Discord Bot
+# Joker
 
 Bot Discord.js v14 pour maintenir le serveur Discord de la guilde **Kool Klown Klanx**.
 

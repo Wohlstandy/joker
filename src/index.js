@@ -43,7 +43,7 @@ if (process.env.PORT) {
 
     const payload = JSON.stringify({
       ok: true,
-      service: 'kool-klown-klanx-discord-bot',
+      service: 'joker',
       discord: client.isReady() ? 'ready' : 'starting',
       uptimeSeconds: Math.round(process.uptime()),
       startedAt: startedAt.toISOString()

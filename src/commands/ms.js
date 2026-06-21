@@ -4,7 +4,7 @@ import { isKlownOrKool } from '../utils/roleGuard.js';
 export default {
   data: new SlashCommandBuilder()
     .setName('ms')
-    .setDescription('Envoie un message avec Klown dans un salon.')
+    .setDescription('Envoie un message avec Joker dans un salon.')
     .addStringOption((option) =>
       option
         .setName('texte')
