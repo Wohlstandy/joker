@@ -254,6 +254,7 @@ export async function runSetup(guild, options = {}) {
   await deleteDefaultChannels(guild);
   const roles = await ensureRoles(guild);
   await ensureAutoAccess(guild);
+  await ensureVisitorAccessForPendingMembers(guild);
   const channels = await ensureChannels(guild, roles, { createMissing: options.createMissing === true });
   await ensureRulesAccess(guild, roles);
   await ensureEntryLogAccess(guild, roles);
