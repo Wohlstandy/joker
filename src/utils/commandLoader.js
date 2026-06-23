@@ -9,7 +9,13 @@ const __dirname = path.dirname(__filename);
 export async function loadCommands() {
   const commands = new Collection();
   const commandsPath = path.resolve(__dirname, '../commands');
-  const files = (await readdir(commandsPath)).filter((file) => file.endsWith('.js'));
+  const files = (await readdir(commandsPath))
+    .filter((file) => file.endsWith('.js'))
+    .sort((a, b) => {
+      if (a === 'supprimer-message.js') return 1;
+      if (b === 'supprimer-message.js') return -1;
+      return a.localeCompare(b);
+    });
 
   for (const file of files) {
     const commandModule = await import(pathToFileURL(path.join(commandsPath, file)).href);
