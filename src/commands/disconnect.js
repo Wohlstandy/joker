@@ -3,7 +3,7 @@ import { logAction } from '../utils/logger.js';
 
 export default {
   data: new ContextMenuCommandBuilder()
-    .setName('Déconnecter du vocal')
+    .setName('Disconnect')
     .setType(ApplicationCommandType.User)
     .setDefaultMemberPermissions(PermissionFlagsBits.MoveMembers)
     .setDMPermission(false),
@@ -12,7 +12,6 @@ export default {
     await interaction.deferReply({ ephemeral: true });
 
     const user = interaction.targetUser;
-    const reason = 'Déconnexion depuis le menu contextuel';
     const member = await interaction.guild.members.fetch(user.id);
     const voiceChannel = member.voice.channel;
 
@@ -28,8 +27,10 @@ export default {
       return;
     }
 
+    const reason = `Disconnect via menu BetterDiscord | Par ${interaction.user.tag}`;
+
     try {
-      await member.voice.disconnect(`${reason} | Par ${interaction.user.tag}`);
+      await member.voice.disconnect(reason);
     } catch {
       await interaction.editReply("Impossible de deconnecter cet utilisateur. Verifie la hierarchie des roles et les permissions du bot.");
       return;
@@ -38,10 +39,10 @@ export default {
     await logAction(
       interaction.guild,
       '\u{1F507} Deconnexion vocal',
-      `${interaction.user} a deconnecte **${user.tag}** de **${voiceChannel.name}**.\nRaison: ${reason}`,
+      `${interaction.user} a deconnecte **${user.tag}** de **${voiceChannel.name}**.`,
       0xf1c40f
     );
 
-    await interaction.editReply(`${user.tag} a ete deconnecte de ${voiceChannel.name}. Raison: ${reason}`);
+    await interaction.deleteReply().catch(() => null);
   }
 };

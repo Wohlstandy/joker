@@ -58,9 +58,14 @@ Le projet, le bot et le dépôt GitHub s'appellent **Joker**. Le serveur Discord
 | `/repar` | Administrateur | Répare les accès sauvegardés. |
 | `/membre` | Administrateur ou gestion des rôles | Donne manuellement le rôle Klown à un utilisateur. |
 | `/kick` | Administrateur ou expulsion | Expulse un utilisateur avec une raison et un log. |
-| `Déconnecter du vocal` | Déplacer des membres | Déconnecte un utilisateur depuis le menu contextuel utilisateur. |
 | `/del` | Administrateur | Supprime un message par ID. |
 | `/ms` | Administrateur | Envoie un message avec le bot dans un salon. |
+
+## Plugin BetterDiscord
+
+Le fichier `betterdiscord/JokerVoiceDisconnect.plugin.js` déplace la commande d'application `Disconnect` hors de `Apps` et la place juste au-dessus du `Disconnect` natif dans le menu contextuel utilisateur BetterDiscord.
+
+Installer le fichier dans le dossier plugins BetterDiscord, puis activer le plugin. L'action utilise le compte Discord connecté et demande la permission `Déplacer des membres` sur le serveur.
 
 ## Flux d'accueil
 
