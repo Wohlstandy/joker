@@ -27,11 +27,6 @@ const commands = [
     description: 'Expulse un utilisateur avec une raison et un log automatique.'
   },
   {
-    name: '/disconnect',
-    access: 'Administrateur ou modérateur avec déplacement des membres',
-    description: "Déconnecte un utilisateur d'un salon vocal."
-  },
-  {
     name: '/setup',
     access: 'Administrateur',
     description: 'Configure tout le serveur Kool Klown Klanx.'

@@ -39,7 +39,11 @@ export default {
   name: 'interactionCreate',
 
   async execute(interaction, client) {
-    if (interaction.isChatInputCommand() || interaction.isMessageContextMenuCommand()) {
+    if (
+      interaction.isChatInputCommand() ||
+      interaction.isMessageContextMenuCommand() ||
+      interaction.isUserContextMenuCommand()
+    ) {
       const command = client.commands.get(interaction.commandName);
 
       if (!command) {

@@ -1,31 +1,18 @@
-import { PermissionFlagsBits, SlashCommandBuilder } from 'discord.js';
+import { ApplicationCommandType, ContextMenuCommandBuilder, PermissionFlagsBits } from 'discord.js';
 import { logAction } from '../utils/logger.js';
 
 export default {
-  data: new SlashCommandBuilder()
-    .setName('disconnect')
-    .setDescription("Deconnecte un utilisateur d'un salon vocal.")
-    .addUserOption((option) =>
-      option
-        .setName('utilisateur')
-        .setDescription('Utilisateur a deconnecter')
-        .setRequired(true)
-    )
-    .addStringOption((option) =>
-      option
-        .setName('raison')
-        .setDescription('Raison de la deconnexion')
-        .setMaxLength(300)
-        .setRequired(false)
-    )
+  data: new ContextMenuCommandBuilder()
+    .setName('Déconnecter du vocal')
+    .setType(ApplicationCommandType.User)
     .setDefaultMemberPermissions(PermissionFlagsBits.MoveMembers)
     .setDMPermission(false),
 
   async execute(interaction) {
     await interaction.deferReply({ ephemeral: true });
 
-    const user = interaction.options.getUser('utilisateur', true);
-    const reason = interaction.options.getString('raison') ?? 'Aucune raison indiquee';
+    const user = interaction.targetUser;
+    const reason = 'Déconnexion depuis le menu contextuel';
     const member = await interaction.guild.members.fetch(user.id);
     const voiceChannel = member.voice.channel;
 
@@ -34,7 +21,9 @@ export default {
       return;
     }
 
-    if (!interaction.guild.members.me.permissions.has(PermissionFlagsBits.MoveMembers)) {
+    const botMember = await interaction.guild.members.fetchMe();
+
+    if (!botMember.permissions.has(PermissionFlagsBits.MoveMembers)) {
       await interaction.editReply("Impossible de deconnecter cet utilisateur: le bot n'a pas la permission Deplacer des membres.");
       return;
     }
