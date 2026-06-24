@@ -95,15 +95,15 @@ module.exports = (() => {
         const appsItem = items.find((item) => this.getDomText(item) === "Apps");
         const nativeDisconnect = items.find((item) => this.getDomText(item) === "Disconnect");
 
-        if (!nativeDisconnect || items.some((item) => item.id === this.domItemId)) continue;
+        if (!appsItem || !nativeDisconnect || items.some((item) => item.id === this.domItemId)) continue;
 
-        const item = this.createDomDisconnectItem(nativeDisconnect);
+        const item = this.createDomDisconnectItem(nativeDisconnect, appsItem);
         nativeDisconnect.parentElement?.insertBefore(item, nativeDisconnect);
-        if (appsItem) appsItem.style.display = "none";
+        appsItem.style.display = "none";
       }
     }
 
-    createDomDisconnectItem(nativeDisconnect) {
+    createDomDisconnectItem(nativeDisconnect, appsItem) {
       const item = nativeDisconnect.cloneNode(true);
       item.id = this.domItemId;
       item.removeAttribute("aria-checked");
@@ -119,18 +119,45 @@ module.exports = (() => {
       item.addEventListener("click", (event) => {
         event.preventDefault();
         event.stopPropagation();
-        this.clickNativeDisconnect(nativeDisconnect);
+        this.runAppsDisconnect(appsItem);
       }, true);
 
       return item;
     }
 
-    clickNativeDisconnect(nativeDisconnect) {
-      this.dispatchPointer(nativeDisconnect, "pointerdown");
-      this.dispatchPointer(nativeDisconnect, "mousedown");
-      this.dispatchPointer(nativeDisconnect, "pointerup");
-      this.dispatchPointer(nativeDisconnect, "mouseup");
-      nativeDisconnect.click();
+    async runAppsDisconnect(appsItem) {
+      this.dispatchPointer(appsItem, "pointerenter");
+      this.dispatchPointer(appsItem, "mouseover");
+      this.dispatchPointer(appsItem, "mouseenter");
+      await this.wait(120);
+
+      const jokerItem = this.findVisibleDomItem("Joker");
+      if (!jokerItem) {
+        BdApi.UI.showToast("Commande Joker introuvable dans Apps.", { type: "error" });
+        return;
+      }
+
+      this.dispatchPointer(jokerItem, "pointerenter");
+      this.dispatchPointer(jokerItem, "mouseover");
+      this.dispatchPointer(jokerItem, "mouseenter");
+      await this.wait(120);
+
+      const disconnectItem = this.findVisibleDomItem("Disconnect", (item) => item.id !== this.domItemId);
+      if (!disconnectItem) {
+        BdApi.UI.showToast("Commande Disconnect introuvable dans Joker.", { type: "error" });
+        return;
+      }
+
+      this.dispatchPointer(disconnectItem, "pointerdown");
+      this.dispatchPointer(disconnectItem, "mousedown");
+      this.dispatchPointer(disconnectItem, "pointerup");
+      this.dispatchPointer(disconnectItem, "mouseup");
+      disconnectItem.click();
+    }
+
+    findVisibleDomItem(text, predicate = () => true) {
+      return Array.from(document.querySelectorAll('[role="menuitem"]'))
+        .find((item) => this.getDomText(item) === text && predicate(item) && item.offsetParent !== null);
     }
 
     getDomMenuItems(menu) {
@@ -150,6 +177,10 @@ module.exports = (() => {
       });
 
       element.dispatchEvent(event);
+    }
+
+    wait(ms) {
+      return new Promise((resolve) => setTimeout(resolve, ms));
     }
 
     patchUserContextMenus() {
