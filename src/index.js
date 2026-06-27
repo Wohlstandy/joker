@@ -10,10 +10,11 @@ import {
   Partials
 } from 'discord.js';
 import { loadCommands, registerApplicationCommands } from './utils/commandLoader.js';
-import { ensureProtectedCategoryAccess, ensureVisitorAccessForPendingMembers } from './utils/setupManager.js';
+import { ensureProtectedCategoryAccess, repairAccess } from './utils/setupManager.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+let protectedAccessStatus = { state: 'pending' };
 
 if (!process.env.DISCORD_TOKEN) {
   throw new Error('DISCORD_TOKEN est manquant. Copie .env.example vers .env puis ajoute le token du bot.');
@@ -45,6 +46,7 @@ if (process.env.PORT) {
       ok: true,
       service: 'joker',
       discord: client.isReady() ? 'ready' : 'starting',
+      protectedAccess: protectedAccessStatus,
       uptimeSeconds: Math.round(process.uptime()),
       startedAt: startedAt.toISOString()
     });
@@ -90,12 +92,15 @@ client.once('clientReady', async () => {
   });
 
   for (const guild of client.guilds.cache.values()) {
-    await ensureProtectedCategoryAccess(guild).catch((error) => {
-      console.error(`Impossible de restaurer les permissions protegees pour ${guild.name}: ${error.message}`);
-    });
-    await ensureVisitorAccessForPendingMembers(guild).catch((error) => {
-      console.error(`Impossible de synchroniser le role visiteur pour ${guild.name}: ${error.message}`);
-    });
+    await repairAccess(guild)
+      .then(() => ensureProtectedCategoryAccess(guild))
+      .then((summary) => {
+        protectedAccessStatus = { state: 'complete', ...summary };
+      })
+      .catch((error) => {
+        protectedAccessStatus = { state: 'failed', error: error.message };
+        console.error(`Impossible de restaurer les permissions protegees pour ${guild.name}: ${error.message}`);
+      });
   }
 
   console.log(`Connecte en tant que ${client.user.tag}`);

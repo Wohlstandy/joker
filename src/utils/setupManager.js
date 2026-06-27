@@ -212,6 +212,30 @@ function hasValidatedAccess(member) {
   );
 }
 
+function normalizeChannelName(name) {
+  return name
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]/g, '');
+}
+
+function getProtectedCategoryChannels(guild, definition) {
+  const expectedName = normalizeChannelName(definition.name);
+  const category = guild.channels.cache.find(
+    (channel) => channel.type === ChannelType.GuildCategory && normalizeChannelName(channel.name) === expectedName
+  );
+
+  if (!category) {
+    return [];
+  }
+
+  return [
+    category,
+    ...guild.channels.cache.filter((channel) => channel.parentId === category.id).values()
+  ];
+}
+
 export async function ensureProtectedCategoryAccess(guild) {
   await guild.roles.fetch().catch(() => null);
   await guild.channels.fetch().catch(() => null);
@@ -221,19 +245,43 @@ export async function ensureProtectedCategoryAccess(guild) {
     ['throne', [roleNames.queen]],
     ['management', [roleNames.klown, roleNames.kool]]
   ]);
+  const summary = {
+    categoriesMatched: 0,
+    channelsMatched: 0,
+    updated: 0,
+    failed: 0,
+    missingRoles: []
+  };
 
   for (const definition of categoryDefinitions.filter((category) => clearSetupPreservedCategoryKeys.has(category.key))) {
     const requiredRoleNames = requiredRolesByCategory.get(definition.key) ?? [];
-    if (requiredRoleNames.some((roleName) => !roles.has(roleName))) {
+    const missingRoleNames = requiredRoleNames.filter((roleName) => !roles.has(roleName));
+    if (missingRoleNames.length) {
+      summary.missingRoles.push(...missingRoleNames);
       continue;
     }
 
-    const channelNames = new Set([definition.name, ...definition.children.map((channel) => channel.name)]);
+    const channels = getProtectedCategoryChannels(guild, definition);
+    if (!channels.length) {
+      continue;
+    }
+
+    summary.categoriesMatched += 1;
+    summary.channelsMatched += channels.length;
     const overwrites = buildPermissionOverwrites(guild, roles, definition.access);
-    for (const channel of guild.channels.cache.filter((candidate) => channelNames.has(candidate.name)).values()) {
-      await channel.permissionOverwrites.set(overwrites).catch(() => null);
+    for (const channel of channels) {
+      await channel.permissionOverwrites.set(overwrites)
+        .then(() => {
+          summary.updated += 1;
+        })
+        .catch(() => {
+          summary.failed += 1;
+        });
     }
   }
+
+  summary.missingRoles = [...new Set(summary.missingRoles)];
+  return summary;
 }
 
 async function hasBotMessage(channel) {
@@ -473,15 +521,12 @@ export async function clearSetup(guild) {
 
   const trackedOrder = new Map(trackedChannelNames.map((name, index) => [name, index]));
   const channelsToDelete = guild.channels.cache.filter((channel) => trackedChannelNames.includes(channel.name));
-  const protectedChannelNames = new Set(
-    categoryDefinitions
-      .filter((category) => clearSetupPreservedCategoryKeys.has(category.key))
-      .flatMap((category) => [category.name, ...category.children.map((channel) => channel.name)])
-  );
   const protectedRoleIds = new Set();
-  for (const channel of guild.channels.cache.filter((candidate) => protectedChannelNames.has(candidate.name)).values()) {
-    for (const roleId of channel.permissionOverwrites.cache.keys()) {
-      protectedRoleIds.add(roleId);
+  for (const definition of categoryDefinitions.filter((category) => clearSetupPreservedCategoryKeys.has(category.key))) {
+    for (const channel of getProtectedCategoryChannels(guild, definition)) {
+      for (const roleId of channel.permissionOverwrites.cache.keys()) {
+        protectedRoleIds.add(roleId);
+      }
     }
   }
 
