@@ -8,6 +8,7 @@ import {
   memberRoleExcludedSearchTerms,
   roleDefinitions,
   roleNames,
+  setupExcludedCategoryKeys,
   trackedChannelNames,
   trackedRoleNames
 } from '../config/serverConfig.js';
@@ -100,6 +101,10 @@ export async function ensureChannels(guild, roles, options = {}) {
   const { createMissing = false } = options;
 
   for (const categoryDefinition of categoryDefinitions) {
+    if (setupExcludedCategoryKeys.has(categoryDefinition.key)) {
+      continue;
+    }
+
     let category = guild.channels.cache.find(
       (channel) => channel.name === categoryDefinition.name && channel.type === ChannelType.GuildCategory
     );
@@ -262,7 +267,6 @@ export async function runSetup(guild, options = {}) {
   const channels = await ensureChannels(guild, roles, { createMissing: options.createMissing === true });
   await ensureRulesAccess(guild, roles);
   await ensureEntryLogAccess(guild, roles);
-  await ensureThroneAccess(guild, channels, roles);
 
   return { roles, channels };
 }

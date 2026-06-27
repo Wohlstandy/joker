@@ -327,7 +327,11 @@ export const legacyRoleNames = [
   '\u{1F921} Membre',
   '\u{1F3AD} Saltimbanque'
 ];
-export const trackedChannelNames = categoryDefinitions.flatMap((category) => [
-  ...(category.preserveExisting ? [] : [category.name]),
-  ...category.children.filter((channel) => !channel.preserveExisting).map((channel) => channel.name)
-]);
+export const setupExcludedCategoryKeys = new Set(['throne', 'management']);
+
+export const trackedChannelNames = categoryDefinitions
+  .filter((category) => !setupExcludedCategoryKeys.has(category.key))
+  .flatMap((category) => [
+    ...(category.preserveExisting ? [] : [category.name]),
+    ...category.children.filter((channel) => !channel.preserveExisting).map((channel) => channel.name)
+  ]);
