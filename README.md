@@ -61,12 +61,6 @@ Le projet, le bot et le dépôt GitHub s'appellent **Joker**. Le serveur Discord
 | `/del` | Administrateur | Supprime un message par ID. |
 | `/ms` | Administrateur | Envoie un message avec le bot dans un salon. |
 
-## Plugin BetterDiscord
-
-Le fichier `betterdiscord/JokerVoiceDisconnect.plugin.js` déplace la commande d'application `Disconnect` hors de `Apps` et la place juste au-dessus du `Disconnect` natif dans le menu contextuel utilisateur BetterDiscord.
-
-Installer le fichier dans le dossier plugins BetterDiscord, puis activer le plugin. L'action utilise le compte Discord connecté et demande la permission `Déplacer des membres` sur le serveur.
-
 ## Flux d'accueil
 
 1. Un nouveau membre humain rejoint le serveur.
