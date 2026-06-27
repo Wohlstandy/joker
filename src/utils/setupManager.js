@@ -17,6 +17,7 @@ import {
   getAutoVisitorIds,
   getSavedRoleEntries,
   registerAutoMember,
+  registerAutoSaltimbanque,
   registerAutoVisitor,
   rememberCurrentMembers
 } from './memberRegistry.js';
@@ -561,6 +562,34 @@ export async function grantMemberAccess(member) {
   }
 
   return { memberRole, visitorRole };
+}
+
+export async function grantSaltimbanqueAccess(member) {
+  await member.guild.roles.fetch().catch(() => null);
+
+  const saltimbanqueRole = findGuildRole(member.guild, roleNames.saltimbanque);
+  const memberRole = findGuildRole(member.guild, roleNames.membre);
+  const visitorRole = findGuildRole(member.guild, roleNames.visiteur);
+
+  if (!saltimbanqueRole) {
+    throw new Error(`Role introuvable: ${roleNames.saltimbanque}`);
+  }
+
+  if (!member.roles.cache.has(saltimbanqueRole.id)) {
+    await member.roles.add(saltimbanqueRole, 'Attribution manuelle du role Saltimbanque');
+  }
+
+  if (memberRole && member.roles.cache.has(memberRole.id)) {
+    await member.roles.remove(memberRole, 'Remplacement du role Klown par Saltimbanque');
+  }
+
+  if (visitorRole && member.roles.cache.has(visitorRole.id)) {
+    await member.roles.remove(visitorRole, 'Attribution manuelle du role Saltimbanque');
+  }
+
+  await registerAutoSaltimbanque(member);
+
+  return { saltimbanqueRole, memberRole, visitorRole };
 }
 
 export async function grantVisitorAccess(member) {

@@ -19,7 +19,7 @@ const commands = [
   {
     name: '/membre',
     access: 'Administrateur ou modérateur avec gestion des rôles',
-    description: 'Donne manuellement le rôle Klown à un utilisateur.'
+    description: 'Donne manuellement le rôle Klown ou Saltimbanque à un utilisateur.'
   },
   {
     name: '/kick',

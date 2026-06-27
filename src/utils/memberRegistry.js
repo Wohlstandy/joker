@@ -135,6 +135,7 @@ export async function registerAutoSaltimbanque(member) {
 
   const registry = await readIds();
   addUserRole(registry, member.id, legacyBuckets.saltimbanques);
+  removeUserRole(registry, member.id, legacyBuckets.members);
   removeUserRole(registry, member.id, legacyBuckets.visitors);
   await writeIds(registry);
 }
