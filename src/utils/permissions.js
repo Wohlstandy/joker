@@ -88,7 +88,7 @@ export function buildPermissionOverwrites(guild, roles, access) {
     ],
     koolOnly: [
       { id: everyone, deny: [PermissionFlagsBits.ViewChannel] },
-      ...roleOverwrites([kool], [...textModerate, PermissionFlagsBits.Connect, PermissionFlagsBits.Speak])
+      ...roleOverwrites([klown, kool], [...textModerate, PermissionFlagsBits.Connect, PermissionFlagsBits.Speak])
     ],
     koolKlownOnly: [
       { id: everyone, deny: [PermissionFlagsBits.ViewChannel] },

@@ -10,7 +10,7 @@ import {
   Partials
 } from 'discord.js';
 import { loadCommands, registerApplicationCommands } from './utils/commandLoader.js';
-import { ensureVisitorAccessForPendingMembers } from './utils/setupManager.js';
+import { ensureProtectedCategoryAccess, ensureVisitorAccessForPendingMembers } from './utils/setupManager.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -90,6 +90,9 @@ client.once('clientReady', async () => {
   });
 
   for (const guild of client.guilds.cache.values()) {
+    await ensureProtectedCategoryAccess(guild).catch((error) => {
+      console.error(`Impossible de restaurer les permissions protegees pour ${guild.name}: ${error.message}`);
+    });
     await ensureVisitorAccessForPendingMembers(guild).catch((error) => {
       console.error(`Impossible de synchroniser le role visiteur pour ${guild.name}: ${error.message}`);
     });

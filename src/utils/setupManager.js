@@ -1,6 +1,7 @@
 import { ChannelType } from 'discord.js';
 import {
   categoryDefinitions,
+  clearSetupPreservedCategoryKeys,
   klownAutoAccessUserIds,
   koolAutoAccessUserIds,
   kweenAutoAccessUserIds,
@@ -8,7 +9,6 @@ import {
   memberRoleExcludedSearchTerms,
   roleDefinitions,
   roleNames,
-  setupExcludedCategoryKeys,
   trackedChannelNames,
   trackedRoleNames
 } from '../config/serverConfig.js';
@@ -101,10 +101,6 @@ export async function ensureChannels(guild, roles, options = {}) {
   const { createMissing = false } = options;
 
   for (const categoryDefinition of categoryDefinitions) {
-    if (setupExcludedCategoryKeys.has(categoryDefinition.key)) {
-      continue;
-    }
-
     let category = guild.channels.cache.find(
       (channel) => channel.name === categoryDefinition.name && channel.type === ChannelType.GuildCategory
     );
@@ -216,36 +212,28 @@ function hasValidatedAccess(member) {
   );
 }
 
-function isConfiguredThroneChannel(channel) {
-  const throneDefinition = categoryDefinitions.find((category) => category.key === 'throne');
-  const throneChannelNames = new Set([
-    throneDefinition.name,
-    ...throneDefinition.children.map((child) => child.name)
+export async function ensureProtectedCategoryAccess(guild) {
+  await guild.roles.fetch().catch(() => null);
+  await guild.channels.fetch().catch(() => null);
+
+  const roles = new Map(guild.roles.cache.map((role) => [role.name, role]));
+  const requiredRolesByCategory = new Map([
+    ['throne', [roleNames.queen]],
+    ['management', [roleNames.klown, roleNames.kool]]
   ]);
 
-  return throneChannelNames.has(channel.name);
-}
+  for (const definition of categoryDefinitions.filter((category) => clearSetupPreservedCategoryKeys.has(category.key))) {
+    const requiredRoleNames = requiredRolesByCategory.get(definition.key) ?? [];
+    if (requiredRoleNames.some((roleName) => !roles.has(roleName))) {
+      continue;
+    }
 
-export async function ensureThroneAccess(guild, channels, roles) {
-  const targets = new Map();
-  for (const channel of [channels.throne, channels.throneText, channels.throneVoice].filter(Boolean)) {
-    targets.set(channel.id, channel);
+    const channelNames = new Set([definition.name, ...definition.children.map((channel) => channel.name)]);
+    const overwrites = buildPermissionOverwrites(guild, roles, definition.access);
+    for (const channel of guild.channels.cache.filter((candidate) => channelNames.has(candidate.name)).values()) {
+      await channel.permissionOverwrites.set(overwrites).catch(() => null);
+    }
   }
-  for (const channel of guild.channels.cache.filter(isConfiguredThroneChannel).values()) {
-    targets.set(channel.id, channel);
-  }
-
-  if (!targets.size) {
-    return [];
-  }
-
-  const overwrites = buildPermissionOverwrites(guild, roles, 'throne');
-
-  for (const channel of targets.values()) {
-    await channel.permissionOverwrites.set(overwrites).catch(() => null);
-  }
-
-  return roles.get(roleNames.queen) ?? null;
 }
 
 async function hasBotMessage(channel) {
@@ -267,6 +255,7 @@ export async function runSetup(guild, options = {}) {
   const channels = await ensureChannels(guild, roles, { createMissing: options.createMissing === true });
   await ensureRulesAccess(guild, roles);
   await ensureEntryLogAccess(guild, roles);
+  await ensureProtectedCategoryAccess(guild);
 
   return { roles, channels };
 }
@@ -484,6 +473,17 @@ export async function clearSetup(guild) {
 
   const trackedOrder = new Map(trackedChannelNames.map((name, index) => [name, index]));
   const channelsToDelete = guild.channels.cache.filter((channel) => trackedChannelNames.includes(channel.name));
+  const protectedChannelNames = new Set(
+    categoryDefinitions
+      .filter((category) => clearSetupPreservedCategoryKeys.has(category.key))
+      .flatMap((category) => [category.name, ...category.children.map((channel) => channel.name)])
+  );
+  const protectedRoleIds = new Set();
+  for (const channel of guild.channels.cache.filter((candidate) => protectedChannelNames.has(candidate.name)).values()) {
+    for (const roleId of channel.permissionOverwrites.cache.keys()) {
+      protectedRoleIds.add(roleId);
+    }
+  }
 
   for (const channel of channelsToDelete.sort((a, b) => {
     if (a.type === ChannelType.GuildCategory && b.type !== ChannelType.GuildCategory) {
@@ -500,7 +500,7 @@ export async function clearSetup(guild) {
 
   for (const roleName of trackedRoleNames) {
     const role = guild.roles.cache.find((candidate) => candidate.name === roleName);
-    if (!role || role.managed || role.name === '@everyone') {
+    if (!role || role.managed || role.name === '@everyone' || protectedRoleIds.has(role.id)) {
       continue;
     }
 
